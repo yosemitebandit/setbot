@@ -25,17 +25,17 @@ oval.attr('stroke-width', '6');
 
 // red solid bean
 var topHalfBean = paper.path(
-  'M 290 300 ' +
+  'M 280 300 ' +
   'c 0 0, 10 -60, 50 -60 ' +
-  'c 40 0, 60 20, 100 20 ' +
-  'c 70 0, 140 -70, 110 40 ' +
+  'c 40 0, 85 20, 125 20 ' +
+  'c 95 0, 140 -70, 110 40 ' +
   'z'
 );
 var scaleFactor = 0.8;
 topHalfBean.scale(scaleFactor, scaleFactor);
 var bottomHalfBean = topHalfBean.clone();
 bottomHalfBean.rotate(180);
-bottomHalfBean.translate(7, -60);
+bottomHalfBean.translate(9, -60);
 var beanAttributes = {
   type: 'path',
   stroke: 'red',
