@@ -24,17 +24,26 @@ oval.attr('stroke-width', '6');
 */
 
 // red solid bean
-var bean = paper.path(
-  'M100 400 ' +
-  'c 400 300 100 800 300 100 ' +
+var topHalfBean = paper.path(
+  'M 290 300 ' +
+  'c 0 0, 10 -60, 50 -60 ' +
+  'c 40 0, 60 20, 100 20 ' +
+  'c 70 0, 140 -70, 110 40 ' +
   'z'
 );
-bean.attr({
+var scaleFactor = 0.8;
+topHalfBean.scale(scaleFactor, scaleFactor);
+var bottomHalfBean = topHalfBean.clone();
+bottomHalfBean.rotate(180);
+bottomHalfBean.translate(7, -60);
+var beanAttributes = {
   type: 'path',
-  stroke: 'blue',
+  stroke: 'red',
   'stroke-width': '3',
   fill: 'red',
-});
+};
+topHalfBean.attr(beanAttributes);
+bottomHalfBean.attr(beanAttributes);
 
 // save on "s"
 $(function() {
