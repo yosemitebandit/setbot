@@ -1,7 +1,20 @@
 playing set, the pattern-finding card game
 
 
-#### rules
+### pipeline
+* generate variants of each card with SVG in the browser
+  * seems like snap-svg is the best tool now,
+  the raphaeljs dev works on that project now
+  * URL parameters determine how the cards look,
+  eg ?symbols=2&shape=bean&color=red&texture=stripes
+  * maybe there can be some more parameters later
+  for, like, skewing shapes
+* use selenium with the phantomjs driver
+to iterate through card combinations and
+save PNGs of the screen
+
+
+#### rules of set
 * each card in set has four characteristics:
 color, symbol, number of symbols and texture.
 * color variants: red, green or purple
@@ -17,5 +30,5 @@ three cards that can be categorized as "two of `X` and one of `Y`" do /not/ cons
 at this point, the player with the most sets wins
 
 
-### other
+### misc
 * useful [bezier editor](http://www.victoriakirst.com/beziertool)
