@@ -15,7 +15,3 @@ three cards that can be categorized as "two of `X` and one of `Y`" do /not/ cons
 * if no sets are found, three additional cards are dealt
 * this continues until there are no more cards to deal,
 at this point, the player with the most sets wins
-
-
-#### architecture
-* each card is an object
