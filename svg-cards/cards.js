@@ -12,6 +12,7 @@ var cardBackground = paper.rect(250, 25, cardWidth, cardHeight, cardRoundedness)
 cardBackground.attr('fill', '#fff');
 cardBackground.attr('stroke', '#000');
 
+/*
 // green empty oval
 var ovalWidth = 250;
 var ovalHeight = 100;
@@ -20,6 +21,20 @@ var oval = paper.rect(300, 250, ovalWidth, ovalHeight, ovalRoundedness);
 oval.attr('fill', '#fff');
 oval.attr('stroke', '#35bd2d');
 oval.attr('stroke-width', '6');
+*/
+
+// red solid bean
+var bean = paper.path(
+  'M100 400 ' +
+  'c 400 300 100 800 300 100 ' +
+  'z'
+);
+bean.attr({
+  type: 'path',
+  stroke: 'blue',
+  'stroke-width': '3',
+  fill: 'red',
+});
 
 // save on "s"
 $(function() {
