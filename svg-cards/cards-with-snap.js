@@ -38,9 +38,33 @@ bottomMatrix.rotate(180, 400, 300);
 bottomMatrix.translate(-145, 0);
 bottomHalfBean.transform(bottomMatrix);
 
+// create the pattern
+var patternPath = (
+  'M 10 -10 ' +
+  'L 10 10 '
+);
+var inversePatternDensity = 11;
+var stripedPattern = paper.path(patternPath).attr({
+  fill: 'none',
+  stroke: 'red',
+  strokeWidth: 1,
+}).toPattern(0, 0, inversePatternDensity, 10);
+
+// group the top and bottom half together
 var bean = paper.g(topHalfBean, bottomHalfBean);
 bean.attr({
-  fill: 'white',
+  fill: stripedPattern,
   stroke: 'red',
   strokeWidth: 3,
 });
+
+// move the whole thing
+var beanMatrix = new Snap.Matrix();
+beanMatrix.translate(0, -30);
+bean.transform(beanMatrix);
+
+// make a second bean and move it in place
+var secondBean = bean.clone();
+secondBeanMatrix = new Snap.Matrix();
+secondBeanMatrix.translate(0, 120);
+secondBean.transform(secondBeanMatrix);
