@@ -43,6 +43,7 @@ var patternPath = (
   'M 10 -10 ' +
   'L 10 10 '
 );
+// magic numbers for good alignment with 10,-10 -> 10,10: 11 and 15
 var inversePatternDensity = 11;
 var stripedPattern = paper.path(patternPath).attr({
   fill: 'none',
