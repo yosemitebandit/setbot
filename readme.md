@@ -32,3 +32,4 @@ at this point, the player with the most sets wins
 
 ### misc
 * useful [bezier editor](http://www.victoriakirst.com/beziertool)
+* [isolated bean image for tracing](http://i.imgur.com/U9k6OMR.png)
