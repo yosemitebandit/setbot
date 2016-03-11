@@ -31,6 +31,7 @@ var cardWidthToShapeWidthRatio = 1.477,
 
 
 // one green empty oval
+/*
 var ovalWidth = shapeWidth,
     ovalHeight = shapeHeight,
     ovalTopLeftCorner = [cardCenter[0] - ovalWidth / 2, cardCenter[1] - ovalHeight / 2],
@@ -41,6 +42,7 @@ oval.attr({
   stroke: '#35bd2d',
   strokeWidth: '6',
 });
+*/
 
 
 /*
@@ -92,32 +94,32 @@ secondBean.transform(secondBeanMatrix);
 */
 
 
-/*
 // three purple solid diamonds
-var diamond = paper.path(
-  'M 175 300 ' +
-  'l 120 -55 ' +
-  'l 120 55 ' +
-  'l -120 55 ' +
-  'l -120 -55 ' +
-  'z'
-);
-var diamondMatrix = new Snap.Matrix();
-diamondMatrix.translate(130, -170);
-diamond.transform(diamondMatrix);
+var leftDiamondCorner = [cardCenter[0] - shapeWidth / 2, cardCenter[1]],
+    diamond = paper.path(
+      'M ' + leftDiamondCorner[0] + ' ' + leftDiamondCorner[1] + ' ' +
+      'l 120 -55 ' +
+      'l 120 55 ' +
+      'l -120 55 ' +
+      'l -120 -55 ' +
+      'z'
+    );
 
 diamond.attr({
   stroke: 'purple',
   fill: 'purple',
 });
 
-var secondDiamond = diamond.clone();
-var secondDiamondMatrix = new Snap.Matrix();
-secondDiamondMatrix.translate(130, -10);
+var cardHeightToVerticalShapeDisplacementRatio = 3.488,
+    verticalShapeDisplacement = cardHeight / cardHeightToVerticalShapeDisplacementRatio,
+    secondDiamond = diamond.clone(),
+    secondDiamondMatrix = new Snap.Matrix();
+
+secondDiamondMatrix.translate(0, -verticalShapeDisplacement);
 secondDiamond.transform(secondDiamondMatrix);
 
-var thirdDiamond = diamond.clone();
-var thirdDiamondMatrix = new Snap.Matrix();
-thirdDiamondMatrix.translate(130, 150);
+var thirdDiamond = diamond.clone(),
+    thirdDiamondMatrix = new Snap.Matrix();
+
+thirdDiamondMatrix.translate(0, verticalShapeDisplacement);
 thirdDiamond.transform(thirdDiamondMatrix);
-*/
