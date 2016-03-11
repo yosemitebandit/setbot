@@ -1,12 +1,13 @@
 // setup
-var width = 800;
-var height = 600;
-var paper = Snap(width, height);
+var width = 800,
+    height = 600,
+    paper = Snap(width, height);
 
 
 // background
-var background = paper.rect(0, 0, width, height);
-background.attr('fill-opacity', 0.0);
+var background = paper.rect(0, 0, width, height).attr({
+  fillOpacity: 0.0
+});
 
 
 // card
@@ -14,10 +15,9 @@ var cardAspectRatio = 0.64,
     cardHeight = 550,
     cardWidth = cardAspectRatio * cardHeight,  // 344
     cardCenter = [cardWidth / 2, cardHeight / 2],
-    cardRoundedness = cardHeight / 28,  // ~20
-    cardBackground = paper.rect(0, 0, cardWidth, cardHeight, cardRoundedness);
+    cardRoundedness = cardHeight / 28;  // 20
 
-cardBackground.attr({
+var cardBackground = paper.rect(0, 0, cardWidth, cardHeight, cardRoundedness).attr({
   fill: '#fff',
   stroke: '#000',
 });
@@ -28,6 +28,25 @@ var cardWidthToShapeWidthRatio = 1.477,
     shapeWidth = cardWidth / cardWidthToShapeWidthRatio,
     shapeAspectRatio = 2.133,
     shapeHeight = shapeWidth / shapeAspectRatio;
+
+
+// Set the locations of the 2- and 3-shape points.
+// The 1-shape point is just the center, as is the 3-shape midpoint.
+var cardHeightToTwoShapeOffsetRatio = 3.524,
+    cardHeightToThreeShapeOffsetRatio = 3.488,
+    twoShapeHighPointOffset = -cardHeight / cardHeightToTwoShapeOffsetRatio / 2,
+    twoShapeLowPointOffset = cardHeight / cardHeightToTwoShapeOffsetRatio / 2,
+    threeShapeHighPointOffset = -cardHeight / cardHeightToThreeShapeOffsetRatio,
+    threeShapeLowPointOffset = cardHeight / cardHeightToThreeShapeOffsetRatio;
+
+
+// variables
+var numberOfShapes = 2,
+    color = 'red',
+    texture = 'striped',
+    shape = 'bean';
+
+
 
 
 // one green empty oval
@@ -44,10 +63,27 @@ oval.attr({
 });
 */
 
+// This scaling factor was determined by first building the bean path
+// and then measuring various things to make the length ratios correct.
+var beanScaleFactor = 0.701;
 
-// two red striped beans
+// Set the horizontal offset so we can put the bean in the middle of the card.
+var beanHorizontalCenteringOffset = -1 * shapeWidth / 2 * beanScaleFactor;
+
+// Set the horizontal offset
+switch (numberOfShapes) {
+  case 1:
+    var beanVerticalCenteringOffset = shapeHeight;
+  case 2:
+    var beanVerticalCenteringOffset = shapeHeight;
+  case 3:
+    var beanVerticalCenteringOffset = shapeHeight;
+}
+
+// This path starts at the leftmost point,
+// so only the x coordinate needs to be shifted in the initial move.
 var bean = paper.path(
-  'M 29, 104 ' +
+  'M ' + (cardCenter[0] + beanHorizontalCenteringOffset) + ' ' + (cardCenter[1] + beanVerticalCenteringOffset) + ' ' +
   'c -7   36,  0   55,  8   68 ' +
   'c  12  19,  33  18,  56  0 ' +
   'c  31 -24,  72 -18,  85 -10 ' +
@@ -61,10 +97,8 @@ var bean = paper.path(
   'c -14  10, -20  25, -27  43 ' +
   'z'
 );
-var beanScaleFactor = 0.8;
 var beanMatrix = new Snap.Matrix()
 beanMatrix.scale(beanScaleFactor);
-beanMatrix.translate(340, 160);
 bean.transform(beanMatrix);
 
 // create the pattern
@@ -88,7 +122,7 @@ bean.attr({
 var secondBean = bean.clone();
 secondBeanMatrix = new Snap.Matrix();
 secondBeanMatrix.scale(beanScaleFactor);
-secondBeanMatrix.translate(340, 360);
+secondBeanMatrix.translate(0, 360);
 secondBean.transform(secondBeanMatrix);
 
 
