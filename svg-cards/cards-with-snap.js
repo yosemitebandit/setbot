@@ -19,6 +19,7 @@ cardBackground.attr({
 });
 
 // two red striped beans
+/*
 var bean = paper.path(
   'M 29, 104 ' +
   'C 22 140, 29 159, 37 172 ' +
@@ -63,3 +64,33 @@ secondBeanMatrix = new Snap.Matrix();
 secondBeanMatrix.scale(beanScaleFactor);
 secondBeanMatrix.translate(340, 360);
 secondBean.transform(secondBeanMatrix);
+*/
+
+
+// three purple solid diamonds
+var diamond = paper.path(
+  'M 175 300 ' +
+  'l 120 -55 ' +
+  'l 120 55 ' +
+  'l -120 55 ' +
+  'l -120 -55 ' +
+  'z'
+);
+var diamondMatrix = new Snap.Matrix();
+diamondMatrix.translate(130, -170);
+diamond.transform(diamondMatrix);
+
+diamond.attr({
+  stroke: 'purple',
+  fill: 'purple',
+});
+
+var secondDiamond = diamond.clone();
+var secondDiamondMatrix = new Snap.Matrix();
+secondDiamondMatrix.translate(130, -10);
+secondDiamond.transform(secondDiamondMatrix);
+
+var thirdDiamond = diamond.clone();
+var thirdDiamondMatrix = new Snap.Matrix();
+thirdDiamondMatrix.translate(130, 150);
+thirdDiamond.transform(thirdDiamondMatrix);
