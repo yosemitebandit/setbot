@@ -6,7 +6,7 @@ var width = 800,
 
 // Setup the SVG background.
 var background = paper.rect(0, 0, width, height).attr({
-  fillOpacity: 0.0
+  fillOpacity: 0.0,
 });
 
 
@@ -25,30 +25,42 @@ var cardBackground = paper.rect(0, 0, cardWidth, cardHeight, cardRoundedness).at
 
 // Variables
 var inputNumberOfShapes = 2,
-    inputColor = 'red',
-    // green '#35bd2d'
-    inputTexture = 'solid',
-    inputShape = 'diamond';
+    inputColor = 'purple',
+    //inputColor = '#35bd2d',
+    inputTexture = 'striped',
+    inputShape = 'bean';
 
 
 // Shape parameters.
 var cardWidthToShapeWidthRatio = 1.477,
     shapeWidth = cardWidth / cardWidthToShapeWidthRatio,
     shapeAspectRatio = 2.133,
-    shapeHeight = shapeWidth / shapeAspectRatio;
+    shapeHeight = shapeWidth / shapeAspectRatio,
+    // This scaling factor was determined by first building the bean path
+    // and then measuring things to make certain length ratios correct.
+    beanScaleFactor = 0.701;
 
 
-// Set the locations of the 2- and 3-shape center points.
-// The 1-shape point is just the center, as is the 3-shape midpoint.
-var cardHeightToTwoShapeOffsetRatio = 3.524,
-    cardHeightToThreeShapeOffsetRatio = 3.488,
-    twoShapeHighPointOffset = -cardHeight / cardHeightToTwoShapeOffsetRatio / 2,
-    twoShapeLowPointOffset = cardHeight / cardHeightToTwoShapeOffsetRatio / 2,
-    threeShapeHighPointOffset = -cardHeight / cardHeightToThreeShapeOffsetRatio,
-    threeShapeLowPointOffset = cardHeight / cardHeightToThreeShapeOffsetRatio;
+// Draw each shape.
+var shapes = [];
+for (var i=0; i<inputNumberOfShapes; i++) {
+  switch (inputShape) {
+    case 'oval':
+      shapes.push(drawOval(paper, cardCenter, shapeWidth, shapeHeight));
+      break;
+    case 'diamond':
+      shapes.push(drawDiamond(paper, cardCenter, shapeWidth, shapeHeight));
+      break;
+    case 'bean':
+      shapes.push(drawBean(paper, cardCenter, shapeWidth, shapeHeight, beanScaleFactor));
+      break;
+  }
+}
 
 
-// Setup texture.
+// Style each shape.
+
+// Setup texture for use in striped fills.
 switch (inputTexture) {
   case 'solid':
     var fillTexture = inputColor;
@@ -69,25 +81,6 @@ switch (inputTexture) {
     break;
 }
 
-
-// Draw each shape.
-var shapes = [];
-for (var i=0; i<inputNumberOfShapes; i++) {
-  switch (inputShape) {
-    case 'oval':
-      shapes.push(drawOval(paper, cardCenter, shapeWidth, shapeHeight));
-      break;
-    case 'diamond':
-      shapes.push(drawDiamond(paper, cardCenter, shapeWidth, shapeHeight));
-      break;
-    case 'bean':
-      shapes.push(drawBean(paper, cardCenter, shapeWidth, shapeHeight));
-      break;
-  }
-}
-
-
-// Style each shape.
 for (var i in shapes) {
   shapes[i].attr({
     fill: fillTexture,
@@ -99,24 +92,34 @@ for (var i in shapes) {
 
 // Move each shape.
 
+// Set the locations of the 2- and 3-shape center points.
+// The 1-shape point is just the center, as is the 3-shape midpoint.
+var cardHeightToTwoShapeOffsetRatio = 3.524,
+    cardHeightToThreeShapeOffsetRatio = 3.488,
+    twoShapeOffset = cardHeight / cardHeightToTwoShapeOffsetRatio / 2,
+    threeShapeOffset = cardHeight / cardHeightToThreeShapeOffsetRatio;
 
-// make a second bean and move it in place
-/*
-var secondBean = bean.clone();
-secondBeanMatrix = new Snap.Matrix();
-secondBeanMatrix.scale(beanScaleFactor);
-secondBeanMatrix.translate(0, 360);
-secondBean.transform(secondBeanMatrix);
-*/
-
-// Set the horizontal offset
-/*
-switch (inputNumberOfShapes) {
-  case 1:
-    var beanVerticalCenteringOffset = shapeHeight;
-  case 2:
-    var beanVerticalCenteringOffset = shapeHeight;
-  case 3:
-    var beanVerticalCenteringOffset = shapeHeight;
+// Create the transform matrices -- if we're drawing multiple beans,
+// we have to apply the scaling again.
+var firstMatrix = new Snap.Matrix();
+var secondMatrix = new Snap.Matrix();
+if (inputShape == 'bean') {
+  firstMatrix.scale(beanScaleFactor);
+  secondMatrix.scale(beanScaleFactor);
 }
-*/
+
+switch (inputNumberOfShapes) {
+  case 2:
+    var offset = twoShapeOffset;
+    break;
+  case 3:
+    var offset = threeShapeOffset;
+    break;
+}
+
+if (inputNumberOfShapes > 1) {
+  firstMatrix.translate(0, offset);
+  shapes[0].transform(firstMatrix);
+  secondMatrix.translate(0, -offset);
+  shapes[1].transform(secondMatrix);
+}

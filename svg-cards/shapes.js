@@ -1,5 +1,3 @@
-
-
 function drawOval(paper, cardCenter, shapeWidth, shapeHeight) {
   // Draws an oval centered on the card.
 
@@ -27,12 +25,8 @@ function drawDiamond(paper, cardCenter, shapeWidth, shapeHeight) {
 }
 
 
-function drawBean(paper, cardCenter, shapeWidth, shapeHeight) {
+function drawBean(paper, cardCenter, shapeWidth, shapeHeight, beanScaleFactor) {
   // Draws a bean centered on the card
-
-  // This scaling factor was determined by first building the bean path
-  // and then measuring various things to make the length ratios correct.
-  var beanScaleFactor = 0.701;
 
   // Set the horizontal offset so we can put the bean in the middle of the card.
   var beanHorizontalCenteringOffset = -1 * shapeWidth / 2 * beanScaleFactor;
@@ -54,7 +48,7 @@ function drawBean(paper, cardCenter, shapeWidth, shapeHeight) {
     'c -14  10, -20  25, -27  43 ' +
     'z'
   );
-  var beanMatrix = new Snap.Matrix()
+  var beanMatrix = new Snap.Matrix();
   beanMatrix.scale(beanScaleFactor);
   bean.transform(beanMatrix);
 
