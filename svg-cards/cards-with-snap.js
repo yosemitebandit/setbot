@@ -18,8 +18,21 @@ cardBackground.attr({
   stroke: '#000',
 });
 
-// two red striped beans
+
+// one green empty oval
+var ovalWidth = 250;
+var ovalHeight = 100;
+var ovalRoundedness = ovalHeight / 2;
+var oval = paper.rect(300, 250, ovalWidth, ovalHeight, ovalRoundedness);
+oval.attr({
+  fill: '#fff',
+  stroke: '#35bd2d',
+  strokeWidth: '6',
+});
+
+
 /*
+// two red striped beans
 var bean = paper.path(
   'M 29, 104 ' +
   'C 22 140, 29 159, 37 172 ' +
@@ -67,6 +80,7 @@ secondBean.transform(secondBeanMatrix);
 */
 
 
+/*
 // three purple solid diamonds
 var diamond = paper.path(
   'M 175 300 ' +
@@ -94,3 +108,4 @@ var thirdDiamond = diamond.clone();
 var thirdDiamondMatrix = new Snap.Matrix();
 thirdDiamondMatrix.translate(130, 150);
 thirdDiamond.transform(thirdDiamondMatrix);
+*/
