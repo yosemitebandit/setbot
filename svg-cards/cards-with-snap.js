@@ -37,7 +37,7 @@ var bean = paper.path(
 var beanScaleFactor = 0.8;
 var beanMatrix = new Snap.Matrix()
 beanMatrix.scale(beanScaleFactor);
-beanMatrix.translate(300, 0);
+beanMatrix.translate(340, 160);
 bean.transform(beanMatrix);
 
 // create the pattern
@@ -61,5 +61,5 @@ bean.attr({
 var secondBean = bean.clone();
 secondBeanMatrix = new Snap.Matrix();
 secondBeanMatrix.scale(beanScaleFactor);
-secondBeanMatrix.translate(300, 300);
+secondBeanMatrix.translate(340, 360);
 secondBean.transform(secondBeanMatrix);
