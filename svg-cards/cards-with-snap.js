@@ -3,9 +3,11 @@ var width = 800;
 var height = 600;
 var paper = Snap(width, height);
 
+
 // background
 var background = paper.rect(0, 0, width, height);
 background.attr('fill-opacity', 0.0);
+
 
 // card
 var aspectRatio = 0.625;
@@ -68,7 +70,7 @@ var stripedPattern = paper.path(patternPath).attr({
 bean.attr({
   fill: stripedPattern,
   stroke: 'red',
-  strokeWidth: 5,
+  strokeWidth: 6,
 });
 
 // make a second bean and move it in place
