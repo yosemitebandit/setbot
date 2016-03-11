@@ -15,5 +15,22 @@
     <script src='snap.svg-min.js'></script>
     <script src='shapes.js'></script>
     <script src='cards.js'></script>
+
+    <script>
+      function getURLParameter(name) {
+        // via http://stackoverflow.com/a/11582513/232638
+        return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null;
+      }
+
+      document.addEventListener('DOMContentLoaded', function() {
+        // Capture URL params.
+        var number = parseInt(getURLParameter('number')),
+            color = getURLParameter('color'),
+            texture = getURLParameter('texture'),
+            shape = getURLParameter('shape');
+
+        drawCard(number, color, texture, shape);
+      });
+    </script>
   </body>
 </html>
