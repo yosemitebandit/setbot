@@ -12,9 +12,9 @@ background.attr('fill-opacity', 0.0);
 // card
 var aspectRatio = 0.625;
 var cardHeight = 550;
-var cardWidth = aspectRatio * cardHeight;
+var cardWidth = aspectRatio * cardHeight;  // 344
 var cardRoundedness = 20;
-var cardBackground = paper.rect(250, 25, cardWidth, cardHeight, cardRoundedness);
+var cardBackground = paper.rect(0, 0, cardWidth, cardHeight, cardRoundedness);
 cardBackground.attr({
   fill: '#fff',
   stroke: '#000',
@@ -25,7 +25,7 @@ cardBackground.attr({
 var ovalWidth = 250;
 var ovalHeight = 100;
 var ovalRoundedness = ovalHeight / 2;
-var oval = paper.rect(300, 250, ovalWidth, ovalHeight, ovalRoundedness);
+var oval = paper.rect(45, 220, ovalWidth, ovalHeight, ovalRoundedness);
 oval.attr({
   fill: '#fff',
   stroke: '#35bd2d',
