@@ -23,6 +23,14 @@ var cardBackground = paper.rect(0, 0, cardWidth, cardHeight, cardRoundedness).at
 });
 
 
+// variables
+var inputNumberOfShapes = 2,
+    inputColor = 'purple',
+    // green '#35bd2d'
+    inputTexture = 'striped',
+    inputShape = 'oval';
+
+
 // shape parameters
 var cardWidthToShapeWidthRatio = 1.477,
     shapeWidth = cardWidth / cardWidthToShapeWidthRatio,
@@ -40,38 +48,67 @@ var cardHeightToTwoShapeOffsetRatio = 3.524,
     threeShapeLowPointOffset = cardHeight / cardHeightToThreeShapeOffsetRatio;
 
 
-// variables
-var numberOfShapes = 2,
-    color = 'red',
-    texture = 'striped',
-    shape = 'bean';
+// setup texture
+switch (inputTexture) {
+  case 'solid':
+    var fillTexture = inputColor;
+    break;
+  case 'empty':
+    var fillTexture = '#fff';
+    break;
+  case 'striped':
+    var patternPath = (
+      'M 5 -10 ' +
+      'L 5  10 '
+    );
+    var fillTexture = paper.path(patternPath).attr({
+      fill: 'none',
+      stroke: inputColor,
+      strokeWidth: 1,
+    }).toPattern(0, 0, 8, 10);
+    break;
+}
 
 
+// draw each shape
+var shapes = [];
+for (var i=0; i<inputNumberOfShapes; i++) {
+  switch (inputShape) {
+    case 'oval':
+      shapes.push(drawOval(paper, cardCenter, shapeWidth, shapeHeight));
+      break;
+    case 'diamond':
+      shapes.push(drawDiamond(paper, cardCenter, shapeWidth, shapeHeight));
+      break;
+    case 'bean':
+      shapes.push(drawBean(paper, cardCenter, shapeWidth, shapeHeight));
+      break;
+  }
+}
 
 
-// one green empty oval
+// style each shape
+for (var i in shapes) {
+  shapes[i].attr({
+    fill: fillTexture,
+    stroke: inputColor,
+    strokeWidth: 6,
+  });
+}
+
+
+// make a second bean and move it in place
 /*
-var ovalWidth = shapeWidth,
-    ovalHeight = shapeHeight,
-    ovalTopLeftCorner = [cardCenter[0] - ovalWidth / 2, cardCenter[1] - ovalHeight / 2],
-    ovalRoundedness = ovalHeight / 2,
-    oval = paper.rect(ovalTopLeftCorner[0], ovalTopLeftCorner[1], ovalWidth, ovalHeight, ovalRoundedness);
-oval.attr({
-  fill: '#fff',
-  stroke: '#35bd2d',
-  strokeWidth: '6',
-});
+var secondBean = bean.clone();
+secondBeanMatrix = new Snap.Matrix();
+secondBeanMatrix.scale(beanScaleFactor);
+secondBeanMatrix.translate(0, 360);
+secondBean.transform(secondBeanMatrix);
 */
 
-// This scaling factor was determined by first building the bean path
-// and then measuring various things to make the length ratios correct.
-var beanScaleFactor = 0.701;
-
-// Set the horizontal offset so we can put the bean in the middle of the card.
-var beanHorizontalCenteringOffset = -1 * shapeWidth / 2 * beanScaleFactor;
-
 // Set the horizontal offset
-switch (numberOfShapes) {
+/*
+switch (inputNumberOfShapes) {
   case 1:
     var beanVerticalCenteringOffset = shapeHeight;
   case 2:
@@ -79,51 +116,7 @@ switch (numberOfShapes) {
   case 3:
     var beanVerticalCenteringOffset = shapeHeight;
 }
-
-// This path starts at the leftmost point,
-// so only the x coordinate needs to be shifted in the initial move.
-var bean = paper.path(
-  'M ' + (cardCenter[0] + beanHorizontalCenteringOffset) + ' ' + (cardCenter[1] + beanVerticalCenteringOffset) + ' ' +
-  'c -7   36,  0   55,  8   68 ' +
-  'c  12  19,  33  18,  56  0 ' +
-  'c  31 -24,  72 -18,  85 -10 ' +
-  'c  34  20,  83  16,  98  12 ' +
-  'c  34 -9,   55 -37,  62 -50 ' +
-  'c  14 -26   13 -67,  1  -79 ' +
-  'c -23 -23  -51  13, -73  18 ' +
-  'c -20  4,  -38  9,  -61  0 ' +
-  'c -24 -9,  -68 -24, -83 -25 ' +
-  'c -33 -2,  -53  12, -65  21 ' +
-  'c -14  10, -20  25, -27  43 ' +
-  'z'
-);
-var beanMatrix = new Snap.Matrix()
-beanMatrix.scale(beanScaleFactor);
-bean.transform(beanMatrix);
-
-// create the pattern
-var patternPath = (
-  'M 5 -10 ' +
-  'L 5 10 '
-);
-var stripedPattern = paper.path(patternPath).attr({
-  fill: 'none',
-  stroke: 'red',
-  strokeWidth: 1,
-}).toPattern(0, 0, 8, 10);
-
-bean.attr({
-  fill: stripedPattern,
-  stroke: 'red',
-  strokeWidth: 6,
-});
-
-// make a second bean and move it in place
-var secondBean = bean.clone();
-secondBeanMatrix = new Snap.Matrix();
-secondBeanMatrix.scale(beanScaleFactor);
-secondBeanMatrix.translate(0, 360);
-secondBean.transform(secondBeanMatrix);
+*/
 
 
 /*
