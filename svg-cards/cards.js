@@ -25,10 +25,10 @@ var cardBackground = paper.rect(0, 0, cardWidth, cardHeight, cardRoundedness).at
 
 // variables
 var inputNumberOfShapes = 2,
-    inputColor = 'purple',
+    inputColor = 'red',
     // green '#35bd2d'
-    inputTexture = 'striped',
-    inputShape = 'oval';
+    inputTexture = 'solid',
+    inputShape = 'diamond';
 
 
 // shape parameters
@@ -116,37 +116,4 @@ switch (inputNumberOfShapes) {
   case 3:
     var beanVerticalCenteringOffset = shapeHeight;
 }
-*/
-
-
-/*
-// three purple solid diamonds
-var leftDiamondCorner = [cardCenter[0] - shapeWidth / 2, cardCenter[1]],
-    diamond = paper.path(
-      'M ' + leftDiamondCorner[0] + ' ' + leftDiamondCorner[1] + ' ' +
-      'l 120 -55 ' +
-      'l 120 55 ' +
-      'l -120 55 ' +
-      'l -120 -55 ' +
-      'z'
-    );
-
-diamond.attr({
-  stroke: 'purple',
-  fill: 'purple',
-});
-
-var cardHeightToVerticalShapeDisplacementRatio = 3.488,
-    verticalShapeDisplacement = cardHeight / cardHeightToVerticalShapeDisplacementRatio,
-    secondDiamond = diamond.clone(),
-    secondDiamondMatrix = new Snap.Matrix();
-
-secondDiamondMatrix.translate(0, -verticalShapeDisplacement);
-secondDiamond.transform(secondDiamondMatrix);
-
-var thirdDiamond = diamond.clone(),
-    thirdDiamondMatrix = new Snap.Matrix();
-
-thirdDiamondMatrix.translate(0, verticalShapeDisplacement);
-thirdDiamond.transform(thirdDiamondMatrix);
 */

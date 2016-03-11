@@ -11,6 +11,22 @@ function drawOval(paper, cardCenter, shapeWidth, shapeHeight) {
 }
 
 
+function drawDiamond(paper, cardCenter, shapeWidth, shapeHeight) {
+  // Draws a diamond centered on the card.
+  var leftDiamondCorner = [cardCenter[0] - shapeWidth / 2, cardCenter[1]],
+      diamond = paper.path(
+         'M ' + leftDiamondCorner[0] + ' ' + leftDiamondCorner[1] + ' ' +
+         'l 120 -55 ' +
+         'l 120 55 ' +
+         'l -120 55 ' +
+         'l -120 -55 ' +
+         'z'
+       );
+
+  return diamond
+}
+
+
 function drawBean(paper, cardCenter, shapeWidth, shapeHeight) {
   // Draws a bean centered on the card
 
