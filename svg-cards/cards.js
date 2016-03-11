@@ -10,22 +10,32 @@ background.attr('fill-opacity', 0.0);
 
 
 // card
-var aspectRatio = 0.625;
-var cardHeight = 550;
-var cardWidth = aspectRatio * cardHeight;  // 344
-var cardRoundedness = 20;
-var cardBackground = paper.rect(0, 0, cardWidth, cardHeight, cardRoundedness);
+var cardAspectRatio = 0.64,
+    cardHeight = 550,
+    cardWidth = cardAspectRatio * cardHeight,  // 344
+    cardCenter = [cardWidth / 2, cardHeight / 2],
+    cardRoundedness = cardHeight / 28,  // ~20
+    cardBackground = paper.rect(0, 0, cardWidth, cardHeight, cardRoundedness);
+
 cardBackground.attr({
   fill: '#fff',
   stroke: '#000',
 });
 
 
+// shape parameters
+var cardWidthToShapeWidthRatio = 1.477,
+    shapeWidth = cardWidth / cardWidthToShapeWidthRatio,
+    shapeAspectRatio = 2.133,
+    shapeHeight = shapeWidth / shapeAspectRatio;
+
+
 // one green empty oval
-var ovalWidth = 250;
-var ovalHeight = 100;
-var ovalRoundedness = ovalHeight / 2;
-var oval = paper.rect(45, 220, ovalWidth, ovalHeight, ovalRoundedness);
+var ovalWidth = shapeWidth,
+    ovalHeight = shapeHeight,
+    ovalTopLeftCorner = [cardCenter[0] - ovalWidth / 2, cardCenter[1] - ovalHeight / 2],
+    ovalRoundedness = ovalHeight / 2,
+    oval = paper.rect(ovalTopLeftCorner[0], ovalTopLeftCorner[1], ovalWidth, ovalHeight, ovalRoundedness);
 oval.attr({
   fill: '#fff',
   stroke: '#35bd2d',
