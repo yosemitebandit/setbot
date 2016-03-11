@@ -1,16 +1,16 @@
-// setup
+// Setup the drawing environment.
 var width = 800,
     height = 600,
     paper = Snap(width, height);
 
 
-// background
+// Setup the SVG background.
 var background = paper.rect(0, 0, width, height).attr({
   fillOpacity: 0.0
 });
 
 
-// card
+// Make the card background.
 var cardAspectRatio = 0.64,
     cardHeight = 550,
     cardWidth = cardAspectRatio * cardHeight,  // 344
@@ -23,7 +23,7 @@ var cardBackground = paper.rect(0, 0, cardWidth, cardHeight, cardRoundedness).at
 });
 
 
-// variables
+// Variables
 var inputNumberOfShapes = 2,
     inputColor = 'red',
     // green '#35bd2d'
@@ -31,14 +31,14 @@ var inputNumberOfShapes = 2,
     inputShape = 'diamond';
 
 
-// shape parameters
+// Shape parameters.
 var cardWidthToShapeWidthRatio = 1.477,
     shapeWidth = cardWidth / cardWidthToShapeWidthRatio,
     shapeAspectRatio = 2.133,
     shapeHeight = shapeWidth / shapeAspectRatio;
 
 
-// Set the locations of the 2- and 3-shape points.
+// Set the locations of the 2- and 3-shape center points.
 // The 1-shape point is just the center, as is the 3-shape midpoint.
 var cardHeightToTwoShapeOffsetRatio = 3.524,
     cardHeightToThreeShapeOffsetRatio = 3.488,
@@ -48,7 +48,7 @@ var cardHeightToTwoShapeOffsetRatio = 3.524,
     threeShapeLowPointOffset = cardHeight / cardHeightToThreeShapeOffsetRatio;
 
 
-// setup texture
+// Setup texture.
 switch (inputTexture) {
   case 'solid':
     var fillTexture = inputColor;
@@ -70,7 +70,7 @@ switch (inputTexture) {
 }
 
 
-// draw each shape
+// Draw each shape.
 var shapes = [];
 for (var i=0; i<inputNumberOfShapes; i++) {
   switch (inputShape) {
@@ -87,7 +87,7 @@ for (var i=0; i<inputNumberOfShapes; i++) {
 }
 
 
-// style each shape
+// Style each shape.
 for (var i in shapes) {
   shapes[i].attr({
     fill: fillTexture,
@@ -95,6 +95,9 @@ for (var i in shapes) {
     strokeWidth: 6,
   });
 }
+
+
+// Move each shape.
 
 
 // make a second bean and move it in place
