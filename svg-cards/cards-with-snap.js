@@ -34,7 +34,7 @@ var bean = paper.path(
   'C 43 69, 37 84, 30 102 ' +
   'z'
 );
-var beanScaleFactor = 0.4;
+var beanScaleFactor = 0.8;
 var beanMatrix = new Snap.Matrix()
 beanMatrix.scale(beanScaleFactor);
 beanMatrix.translate(300, 0);
@@ -42,23 +42,24 @@ bean.transform(beanMatrix);
 
 // create the pattern
 var patternPath = (
-  'M 10 -10 ' +
-  'L 10 10 '
+  'M 5 -10 ' +
+  'L 5 10 '
 );
 var stripedPattern = paper.path(patternPath).attr({
   fill: 'none',
   stroke: 'red',
   strokeWidth: 1,
-}).toPattern(0, 0, 10, 10);
+}).toPattern(0, 0, 8, 10);
 
 bean.attr({
   fill: stripedPattern,
   stroke: 'red',
-  strokeWidth: 3,
+  strokeWidth: 5,
 });
 
 // make a second bean and move it in place
 var secondBean = bean.clone();
 secondBeanMatrix = new Snap.Matrix();
-secondBeanMatrix.translate(0, 120);
+secondBeanMatrix.scale(beanScaleFactor);
+secondBeanMatrix.translate(300, 300);
 secondBean.transform(secondBeanMatrix);
