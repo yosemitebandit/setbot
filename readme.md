@@ -3,15 +3,14 @@ playing set, the pattern-finding card game
 
 ### pipeline
 * generate variants of each card with SVG in the browser
-  * seems like snap-svg is the best tool now,
-  the raphaeljs dev works on that project now
-  * URL parameters determine how the cards look,
-  eg ?symbols=2&shape=bean&color=red&texture=stripes
-  * maybe there can be some more parameters later
-  for, like, skewing shapes
-* use selenium with the phantomjs driver
-to iterate through card combinations and
-save PNGs of the screen
+  * seems like snap-svg is the best tool now, the raphaeljs dev works on that project now..
+  * URL parameters determine how the cards look, eg ?number=2&color=red&texture=stripes&shape=bean
+  * maybe there can be some more parameters later for, like, skewing shapes
+* serve the page from the root via `python -m SimpleHTTPServer`
+* use selenium with the phantomjs driver to iterate through card combinations
+and save screenshots
+* another script crops the images and makes more copies that are skewed and rotated
+(see ipython notebook)
 
 
 #### rules of set
