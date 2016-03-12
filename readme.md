@@ -1,7 +1,7 @@
 playing set, the pattern-finding card game
 
 
-### pipeline
+#### pipeline
 * generate variants of each card with SVG in the browser
   * seems like snap-svg is the best tool now, the raphaeljs dev works on that project now..
   * URL parameters determine how the cards look, eg ?number=2&color=red&texture=stripes&shape=bean
@@ -10,8 +10,9 @@ playing set, the pattern-finding card game
 * use selenium with the phantomjs driver to iterate through card combinations
 and save screenshots
 * an ipython notebook crops and rotates the images, generating more input data
+(`generate_shapes.ipynb`)
 * one neural network guesses how many shapes are present in an input image
-(see ipython notebook)
+(`count_shapes.ipynb`)
 
 
 #### rules of set
@@ -30,6 +31,6 @@ three cards that can be categorized as "two of `X` and one of `Y`" do /not/ cons
 at this point, the player with the most sets wins
 
 
-### misc
+#### misc
 * useful [bezier editor](http://www.victoriakirst.com/beziertool)
 * [isolated bean image for tracing](http://i.imgur.com/U9k6OMR.png)
