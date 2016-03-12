@@ -16,7 +16,7 @@ function drawCard(inputNumberOfShapes, inputColor, inputTexture, inputShape) {
   // Make the card background.
   var cardAspectRatio = 0.64,
       cardHeight = 550,
-      cardWidth = cardAspectRatio * cardHeight,  // 344
+      cardWidth = cardAspectRatio * cardHeight,  // 352
       cardCenter = [cardWidth / 2, cardHeight / 2],
       cardRoundedness = cardHeight / 28;  // 20
 
