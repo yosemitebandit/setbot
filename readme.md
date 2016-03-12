@@ -9,8 +9,8 @@ playing set, the pattern-finding card game
 * serve the page from the root via `python -m SimpleHTTPServer`
 * use selenium with the phantomjs driver to iterate through card combinations
 and save screenshots
-* an ipython notebook crops and rotates the images, generating more input data
-(`generate_shapes.ipynb`)
+* an ipython notebook generates more data by rotating the original set of cards,
+and preprocesses the images in other ways (`generate_shapes.ipynb`)
 * one neural network guesses how many shapes are present in an input image
 (`count_shapes.ipynb`)
 
