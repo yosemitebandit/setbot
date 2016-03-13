@@ -17,6 +17,7 @@ and preprocesses the images in other ways (`generate_shapes.ipynb`)
 
 #### next steps
 * use train / validation / test splitting in the shape counting model
+* add a relu layer
 * classifier that uses RGB data (picking out the color)
 * save the trained model and use it in an evaluation script
 * end-to-end test with an actual picture of a card
