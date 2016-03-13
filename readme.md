@@ -15,6 +15,13 @@ and preprocesses the images in other ways (`generate_shapes.ipynb`)
 (`count_shapes.ipynb`)
 
 
+#### next steps
+* use train / validation / test splitting in the shape counting model
+* classifier that uses RGB data (picking out the color)
+* save the trained model and use it in an evaluation script
+* end-to-end test with an actual picture of a card
+
+
 #### rules of set
 * each card in set has four characteristics:
 color, symbol, number of symbols and texture.
