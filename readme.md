@@ -6,13 +6,16 @@ playing set, the pattern-finding card game
   * seems like snap-svg is the best tool now, the raphaeljs dev works on that project now..
   * URL parameters determine how the cards look, eg ?number=2&color=red&texture=stripes&shape=bean
   * maybe there can be some more parameters later for, like, skewing shapes
-* serve the page from the root via `python -m SimpleHTTPServer`
+* serve the page from the root via `python -m SimpleHTTPServer` (see `svg-cards`)
 * use selenium with the phantomjs driver to iterate through card combinations
-and save screenshots
+and save screenshots (see `download_cards.py`)
 * an ipython notebook generates more data by rotating the original set of cards,
 and preprocesses the images in other ways (`generate_shapes.ipynb`)
 * one neural network guesses how many shapes are present in an input image
 (`count_shapes.ipynb`)
+* another model guesses the color of the shapes (`detect_color.ipynb`)
+* an evaluation routine loads pre-trained models and examines new pictures of cards
+(`evaluator.ipynb`)
 
 
 #### next steps
