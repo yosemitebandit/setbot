@@ -1,5 +1,8 @@
 playing set, the pattern-finding card game
 
+I'm generating images of each card via SVG
+and then using several TensorFlow models to classify these synthetic examples.
+
 
 #### pipeline
 * generate variants of each card with SVG in the browser
