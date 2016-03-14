@@ -16,7 +16,8 @@ and preprocesses the images in other ways (`generate_shapes.ipynb`)
 
 
 #### next steps
-* end-to-end test with an actual picture of a card
+* try more IRL card pictures
+* consider adding skewed images
 
 
 #### rules of set
