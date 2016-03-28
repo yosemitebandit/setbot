@@ -18,6 +18,7 @@ preprocesses the images in other ways, and generates data files (`generate_shape
   (`detect_number.ipynb`)
   * another model guesses the color of the shapes (`detect_color.ipynb`)
   * another predicts the type shape on the card (`detect_shape.ipynb`)
+  * and the last predicts the card's texture (`detect_texture.ipynb`)
 * an evaluation routine loads pre-trained models and examines new pictures of cards
 (`evaluator.ipynb`)
 
@@ -25,6 +26,7 @@ preprocesses the images in other ways, and generates data files (`generate_shape
 #### next steps
 * try more IRL card pictures
 * consider adding skewed images
+* adaptive learning rate?
 
 
 #### rules of set
