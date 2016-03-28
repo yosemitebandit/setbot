@@ -15,8 +15,9 @@ and save screenshots (see `download_cards.py`)
 preprocesses the images in other ways, and generates data files (`generate_shapes.ipynb`)
 * create various models to classify the properties of each card
   * one neural network guesses how many shapes are present in an input image
-  (`count_shapes.ipynb`)
+  (`detect_number.ipynb`)
   * another model guesses the color of the shapes (`detect_color.ipynb`)
+  * another predicts the type shape on the card (`detect_shape.ipynb`)
 * an evaluation routine loads pre-trained models and examines new pictures of cards
 (`evaluator.ipynb`)
 
@@ -24,7 +25,6 @@ preprocesses the images in other ways, and generates data files (`generate_shape
 #### next steps
 * try more IRL card pictures
 * consider adding skewed images
-* remove hashing in the data fold splits..just seed the rng
 
 
 #### rules of set
