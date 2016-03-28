@@ -12,7 +12,7 @@ and then using several TensorFlow models to classify these synthetic examples.
 * use selenium with the phantomjs driver to iterate through card combinations
 and save screenshots (see `download_cards.py`)
 * an ipython notebook generates more data by rotating the original set of cards,
-and preprocesses the images in other ways (`generate_shapes.ipynb`)
+preprocesses the images in other ways, and generates data files (`generate_shapes.ipynb`)
 * create various models to classify the properties of each card
   * one neural network guesses how many shapes are present in an input image
   (`count_shapes.ipynb`)
@@ -24,6 +24,7 @@ and preprocesses the images in other ways (`generate_shapes.ipynb`)
 #### next steps
 * try more IRL card pictures
 * consider adding skewed images
+* remove hashing in the data fold splits..just seed the rng
 
 
 #### rules of set
