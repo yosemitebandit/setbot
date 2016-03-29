@@ -16,7 +16,7 @@ preprocesses the images in other ways, and generates data files (`generate_shape
 * create various models to classify the properties of each card
   * one neural network guesses how many shapes are present in an input image
   (`detect_number.ipynb`) -- 99% accurate
-  * another model guesses the color of the shapes (`detect_color.ipynb`) -- 79% accurate
+  * another model guesses the color of the shapes (`detect_color.ipynb`) -- 91% accurate
   * another predicts the type shape on the card (`detect_shape.ipynb`) -- 92% accurate
   * and the last predicts the card's texture (`detect_texture.ipynb`) -- 94% accurate
 * an evaluation routine loads pre-trained models and examines new pictures of cards
