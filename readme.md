@@ -6,7 +6,7 @@ and then using several TensorFlow models to classify these synthetic examples.
 
 #### pipeline
 * generate variants of each card with SVG in the browser
-  * URL parameters determine how the cards look, eg ?number=2&color=red&texture=stripes&shape=bean
+  * URL parameters determine how the cards look, eg `?number=2&color=red&texture=stripes&shape=bean`
   * maybe there can be some more parameters later for, like, skewing shapes
   * serve the page from the root via `python -m SimpleHTTPServer` (see `svg-cards`)
 * use selenium with the phantomjs driver to iterate through card combinations
