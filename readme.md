@@ -24,7 +24,6 @@ preprocesses the images in other ways, and generates data files (`generate_shape
 
 
 #### next steps
-* try more IRL card pictures
 * consider adding skewed images
 * use [more cores for image generation](http://stackoverflow.com/a/23537302/232638)
 
