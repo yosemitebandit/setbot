@@ -31,8 +31,10 @@ and save screenshots (see `download_cards.py`)
 
 #### next steps
 * consider adding skewed images
-* blur inputs in the evaluator?
 * camera tests with raspberry pi
+* count correct features in evaluator
+* load your models and run the synthetic data through them
+as a sanity check to the loading process
 
 
 #### rules of set
