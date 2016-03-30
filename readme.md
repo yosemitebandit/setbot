@@ -27,7 +27,6 @@ preprocesses the images in other ways, and generates data files (`generate_shape
 * need to use contexts in the evaluator..?  Not sure if vars are /actually/ loading correctly
 * more input data (currently at 2430 input images only)
 * consider adding skewed images
-* consider adjusting white balance
 * use [more cores for image generation](http://stackoverflow.com/a/23537302/232638)
 
 
