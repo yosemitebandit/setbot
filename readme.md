@@ -17,6 +17,7 @@ and save screenshots (see `download_cards.py`)
   * rotated,
   * sized equally,
   * resized (shrunk),
+  * blurred,
   * and greyscaled
   * the rgb and greyscaled images are converted to separate npy files
 * create various models to classify the properties of each card
@@ -30,9 +31,8 @@ and save screenshots (see `download_cards.py`)
 
 
 #### next steps
-* need to use contexts in the evaluator..?  Not sure if vars are /actually/ loading correctly
-* more input data (currently at 2430 input images only)
 * consider adding skewed images
+* image generation can be more streamlined -- there need note be so many intermediate images
 * use [more cores for image generation](http://stackoverflow.com/a/23537302/232638)
 
 
