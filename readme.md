@@ -33,7 +33,6 @@ and save screenshots (see `download_cards.py`)
 #### next steps
 * consider adding skewed images
 * image generation can be more streamlined -- there need note be so many intermediate images
-* use [more cores for image generation](http://stackoverflow.com/a/23537302/232638)
 
 
 #### rules of set
