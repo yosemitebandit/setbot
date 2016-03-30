@@ -31,7 +31,7 @@ and save screenshots (see `download_cards.py`)
 
 #### next steps
 * consider adding skewed images
-* blur inputs in the evaluator?
+* count correct features in evaluator
 
 
 #### rules of set
