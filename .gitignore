@@ -11,3 +11,5 @@ irl-greyscaled-images/
 greyscaled-data/
 rgb-data/
 *.pyc
+rgba-data/
+rgba-images/
