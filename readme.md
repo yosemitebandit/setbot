@@ -11,8 +11,14 @@ and then using several TensorFlow models to classify these synthetic examples.
   * serve the page from the root via `python -m SimpleHTTPServer` (see `svg-cards`)
 * use selenium with the phantomjs driver to iterate through card combinations
 and save screenshots (see `download_cards.py`)
-* an ipython notebook generates more data by rotating the original set of cards,
-preprocesses the images in other ways, and generates data files (`generate_shapes.ipynb`)
+* an ipython notebook generates more images and data (`generate_shapes.ipynb`):
+  * images are cropped,
+  * intensified,
+  * rotated,
+  * sized equally,
+  * resized (shrunk),
+  * and greyscaled
+  * the rgb and greyscaled images are converted to separate npy files
 * create various models to classify the properties of each card
   * one neural network guesses how many shapes are present in an input image
   (`detect_number.ipynb`) -- 99% accurate
