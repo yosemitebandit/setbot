@@ -22,7 +22,7 @@ and save screenshots (see `download_cards.py`)
   * the rgb and greyscaled images are converted to separate npy files
 * create various models to classify the properties of each card
   * one neural network guesses how many shapes are present in an input image
-  (`detect_number.ipynb`) -- 99% accurate
+  (`detect_number.ipynb`) -- 96% accurate
   * another model guesses the color of the shapes (`detect_color.ipynb`) -- 95% accurate
   * another predicts the type shape on the card (`detect_shape.ipynb`) -- 97% accurate
   * and the last predicts the card's texture (`detect_texture.ipynb`) -- 99% accurate
