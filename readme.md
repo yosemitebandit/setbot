@@ -11,11 +11,10 @@ and then using several TensorFlow models to classify these synthetic examples.
   * serve the page from the root via `python -m SimpleHTTPServer` (see `svg-cards`)
 * use selenium with the phantomjs driver to iterate through card combinations
 and save screenshots (see `download_cards.py`)
-* an ipython notebook generates more images and data (`generate_shapes.ipynb`):
+* an ipython notebook generates more images and data (`generate_input_data.ipynb`):
   * images are cropped,
   * intensified,
   * rotated,
-  * sized equally,
   * resized (shrunk),
   * blurred,
   * and greyscaled
@@ -32,6 +31,7 @@ and save screenshots (see `download_cards.py`)
 
 #### next steps
 * consider adding skewed images
+* blur inputs in the evaluator?
 
 
 #### rules of set
