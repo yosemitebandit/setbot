@@ -14,7 +14,7 @@ rval, frame = vc.read()
 while True:
   # Show in preview window.
   if frame is not None:
-     cv2.imshow('preview', frame)
+    cv2.imshow('preview', frame)
 
   # Save.
   cv2.imwrite('/tmp/out.png', frame)
@@ -24,7 +24,7 @@ while True:
 
   # Break on 'q'.
   if cv2.waitKey(1) & 0xFF == ord('q'):
-     break
+    break
 
   # Wait.
-  time.sleep(1)
+  time.sleep(0.1)
