@@ -8,11 +8,14 @@ import numpy as np
 cv2.namedWindow('preview')
 vc = cv2.VideoCapture(0)
 rval, frame = vc.read()
-size = 900
 
-sensitivity = 80
+sensitivity = 74
 lower_white = np.array([0, 0, 255-sensitivity])
 upper_white = np.array([255, sensitivity, 255])
+
+size = 150
+new_image = np.zeros((size*3, size*6, 3), np.uint8)
+h = np.array([[0, 0], [size, 0], [size, size], [0, size]], np.float32)
 
 while True:
   # Show in preview window.
@@ -28,6 +31,9 @@ while True:
     rectangles, nw_corners = [], []
     for contour in contours:
       rect = cv2.minAreaRect(contour)
+      rotated = list(rect)
+      rotated[2] = 90
+      rect = tuple(rotated)
       points = np.array(cv2.cv.BoxPoints(rect), np.float32)
       rectangles.append(points)
       # Find NW corner.
@@ -44,22 +50,17 @@ while True:
     top_row.extend(bottom_row)
     ordered_corners = top_row
 
-    size = 150
-    new_image = np.zeros((size, size, 3), np.float32)
     for index, corner in enumerate(ordered_corners):
       for points in rectangles:
         if corner not in points:
           continue
-        h = np.array([[0, 0], [size, 0], [size, size], [0, size]], np.float32)
         transform = cv2.getPerspectiveTransform(points, h)
         warp = cv2.warpPerspective(frame, transform, (size, size))
-        x_offset = 150 * (index % 6)
-        y_offset = 150 * (index / 6)
-        #print x_offset, y_offset
-        #new_image[x_offset:x_offset+size, y_offset:y_offset+size] = warp
-        np.concatenate((new_image, warp), axis=0)
+        x_offset = size * (index / 6)
+        y_offset = size * (index % 6)
+        new_image[x_offset:x_offset+size, y_offset:y_offset+size, :3] = warp
 
-    cv2.imshow('preview', warp)
+    cv2.imshow('preview', new_image)
 
 
   # Save.
