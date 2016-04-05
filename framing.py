@@ -8,23 +8,23 @@ import cv2
 import numpy as np
 
 
-def noop(x):
-  pass
-
 cv2.namedWindow('preview')
-cv2.createTrackbar('sensitivity', 'preview', 0, 255, noop)
+cv2.createTrackbar('sensitivity', 'preview', 80, 255, lambda x: x)
 
 vc = cv2.VideoCapture(0)
 rval, frame = vc.read()
 size = 900
-sensitivity = 60
-lower_white = np.array([0, 0, 255-sensitivity])
-upper_white = np.array([255, sensitivity, 255])
 
 
 while True:
   # Show in preview window.
   if frame is not None:
+
+    # Set threshold.
+    sensitivity = cv2.getTrackbarPos('sensitivity', 'preview')
+    lower_white = np.array([0, 0, 255-sensitivity])
+    upper_white = np.array([255, sensitivity, 255])
+    print sensitivity
 
     # Find contours.
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -50,11 +50,6 @@ while True:
     # Display
     cv2.imshow('preview', thresh)
 
-    # Update threshold.
-    sensitivity = cv2.getTrackbarPos('sensitivity', 'preview')
-    lower_white = np.array([0, 0, 255-sensitivity])
-    upper_white = np.array([255, sensitivity, 255])
-    print sensitivity
 
   # Save.
   cv2.imwrite('/tmp/out.png', frame)
