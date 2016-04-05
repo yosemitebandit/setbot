@@ -31,10 +31,10 @@ and save screenshots (see `download_cards.py`)
 
 #### next steps
 * consider adding skewed images
-* camera tests with raspberry pi
 * count correct features in evaluator
-* load your models and run the synthetic data through them
-as a sanity check to the loading process
+* make one network for all 81 cards?
+* make sure the test set has an even distribution of classes (ala CIFAR-10)
+* black background
 
 
 #### rules of set

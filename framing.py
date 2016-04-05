@@ -17,7 +17,6 @@ while True:
   # Show in preview window.
   if frame is not None:
 
-    '''
     # Find contours.
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     blur = cv2.GaussianBlur(gray, (1, 1), 10)
@@ -37,8 +36,8 @@ while True:
 
     # Display
     cv2.imshow('preview', warp)
-    '''
 
+    '''
     sensitivity = 80
     lower_white = np.array([0, 0, 255-sensitivity])
     upper_white = np.array([255, sensitivity, 255])
@@ -81,9 +80,10 @@ while True:
         y_offset = 150 * (index / 6)
         #print x_offset, y_offset
         #new_image[x_offset:x_offset+size, y_offset:y_offset+size] = warp
-        np.concatenate((new_image, warp), axis=0)
+        np.concatenate((warp, new_image), axis=0)
 
-    cv2.imshow('preview', warp)
+    cv2.imshow('preview', new_image)
+    '''
 
 
   # Save.
