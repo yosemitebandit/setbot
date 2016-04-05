@@ -8,10 +8,19 @@ import cv2
 import numpy as np
 
 
+def noop(x):
+  pass
+
 cv2.namedWindow('preview')
+cv2.createTrackbar('sensitivity', 'preview', 0, 255, noop)
+
 vc = cv2.VideoCapture(0)
 rval, frame = vc.read()
 size = 900
+sensitivity = 60
+lower_white = np.array([0, 0, 255-sensitivity])
+upper_white = np.array([255, sensitivity, 255])
+
 
 while True:
   # Show in preview window.
@@ -34,10 +43,18 @@ while True:
     transform = cv2.getPerspectiveTransform(r, h)
     warp = cv2.warpPerspective(frame, transform, (size, size))
 
+    # Threshold with color filtering.
+    hsv_img = cv2.cvtColor(warp, cv2.COLOR_BGR2HSV)
+    thresh = cv2.inRange(hsv_img, lower_white, upper_white)
+
     # Display
-    cv2.imshow('preview', warp)
+    cv2.imshow('preview', thresh)
 
-
+    # Update threshold.
+    sensitivity = cv2.getTrackbarPos('sensitivity', 'preview')
+    lower_white = np.array([0, 0, 255-sensitivity])
+    upper_white = np.array([255, sensitivity, 255])
+    print sensitivity
 
   # Save.
   cv2.imwrite('/tmp/out.png', frame)
