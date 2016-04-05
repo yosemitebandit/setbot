@@ -34,7 +34,8 @@ and save screenshots (see `download_cards.py`)
 * count correct features in evaluator
 * make one network for all 81 cards?
 * make sure the test set has an even distribution of classes (ala CIFAR-10)
-* black background
+* black background in the camera rig
+* make the cards smaller?
 
 
 #### rules of set
