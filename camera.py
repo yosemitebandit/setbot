@@ -6,26 +6,30 @@ import numpy as np
 
 
 cv2.namedWindow('preview')
+cv2.createTrackbar('sensitivity', 'preview', 80, 255, lambda x: x)
+
 vc = cv2.VideoCapture(0)
 rval, frame = vc.read()
 
-sensitivity = 74
-lower_white = np.array([0, 0, 255-sensitivity])
-upper_white = np.array([255, sensitivity, 255])
-
 size = 150
-new_image = np.zeros((size*3, size*6, 3), np.uint8)
+new_image = np.zeros((size*3, size*4, 3), np.uint8)
 h = np.array([[0, 0], [size, 0], [size, size], [0, size]], np.float32)
 
 while True:
   # Show in preview window.
   if frame is not None:
 
+    # Set threshold.
+    sensitivity = cv2.getTrackbarPos('sensitivity', 'preview')
+    lower_white = np.array([0, 0, 255-sensitivity])
+    upper_white = np.array([255, sensitivity, 255])
+    print sensitivity
+
     hsv_img = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     thresh = cv2.inRange(hsv_img, lower_white, upper_white)
 
     contours, _ = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    contours = sorted(contours, key=cv2.contourArea, reverse=True)[0:18]
+    contours = sorted(contours, key=cv2.contourArea, reverse=True)[0:12]
 
     # Sort contours by distance from top left.
     rectangles, nw_corners = [], []
@@ -42,9 +46,9 @@ while True:
       nw_corners.append(north_points[0])
 
     nw_corners = sorted(nw_corners, key=lambda p: p[1], reverse=True)
-    top_row = sorted(nw_corners[0:6], key=lambda p: p[0], reverse=True)
-    middle_row = sorted(nw_corners[6:12], key=lambda p: p[0], reverse=True)
-    bottom_row = sorted(nw_corners[12:18], key=lambda p: p[0], reverse=True)
+    top_row = sorted(nw_corners[0:4], key=lambda p: p[0], reverse=True)
+    middle_row = sorted(nw_corners[4:8], key=lambda p: p[0], reverse=True)
+    bottom_row = sorted(nw_corners[8:12], key=lambda p: p[0], reverse=True)
 
     top_row.extend(middle_row)
     top_row.extend(bottom_row)
@@ -56,15 +60,15 @@ while True:
           continue
         transform = cv2.getPerspectiveTransform(points, h)
         warp = cv2.warpPerspective(frame, transform, (size, size))
-        x_offset = size * (index / 6)
-        y_offset = size * (index % 6)
+        x_offset = size * (index / 4)
+        y_offset = size * (index % 4)
         new_image[x_offset:x_offset+size, y_offset:y_offset+size, :3] = warp
 
     cv2.imshow('preview', new_image)
 
 
   # Save.
-  #cv2.imwrite('/tmp/out.png', frame)
+  cv2.imwrite('/tmp/out.png', frame)
 
   # Capture another.
   rval, frame = vc.read()
