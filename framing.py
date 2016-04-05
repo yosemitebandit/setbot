@@ -52,7 +52,7 @@ while True:
 
 
   # Save.
-  cv2.imwrite('/tmp/out.png', frame)
+  cv2.imwrite('/tmp/out.png', thresh)
 
   # Capture another.
   rval, frame = vc.read()
