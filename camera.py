@@ -11,8 +11,13 @@ cv2.createTrackbar('sensitivity', 'preview', 80, 255, lambda x: x)
 vc = cv2.VideoCapture(0)
 rval, frame = vc.read()
 
+number_of_cards = 18
+cards_per_row = number_of_cards / 3
+cards_per_col = 3
+channels = 3
 size = 150
-new_image = np.zeros((size*3, size*4, 3), np.uint8)
+new_image = np.zeros(
+  (size*cards_per_col, size*cards_per_row, channels), np.uint8)
 h = np.array([[0, 0], [size, 0], [size, size], [0, size]], np.float32)
 
 while True:
@@ -28,8 +33,10 @@ while True:
     hsv_img = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     thresh = cv2.inRange(hsv_img, lower_white, upper_white)
 
-    contours, _ = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    contours = sorted(contours, key=cv2.contourArea, reverse=True)[0:12]
+    contours, _ = cv2.findContours(
+      thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    contours = sorted(
+      contours, key=cv2.contourArea, reverse=True)[0:number_of_cards]
 
     # Sort contours by distance from top left.
     rectangles, nw_corners = [], []
@@ -45,11 +52,14 @@ while True:
       north_points = sorted(west_points, key=lambda p: p[1])
       nw_corners.append(north_points[0])
 
-    nw_corners = sorted(nw_corners, key=lambda p: p[1], reverse=True)
-    top_row = sorted(nw_corners[0:4], key=lambda p: p[0], reverse=True)
-    middle_row = sorted(nw_corners[4:8], key=lambda p: p[0], reverse=True)
-    bottom_row = sorted(nw_corners[8:12], key=lambda p: p[0], reverse=True)
-
+    nw_corners = sorted(
+      nw_corners, key=lambda p: p[1], reverse=True)
+    top_row = sorted(
+      nw_corners[0:cards_per_row], key=lambda p: p[0], reverse=True)
+    middle_row = sorted(nw_corners[cards_per_row:2*cards_per_row],
+                        key=lambda p: p[0], reverse=True)
+    bottom_row = sorted(nw_corners[2*cards_per_row:3*cards_per_row],
+                        key=lambda p: p[0], reverse=True)
     top_row.extend(middle_row)
     top_row.extend(bottom_row)
     ordered_corners = top_row
@@ -60,9 +70,10 @@ while True:
           continue
         transform = cv2.getPerspectiveTransform(points, h)
         warp = cv2.warpPerspective(frame, transform, (size, size))
-        x_offset = size * (index / 4)
-        y_offset = size * (index % 4)
-        new_image[x_offset:x_offset+size, y_offset:y_offset+size, :3] = warp
+        x_offset = size * (index / cards_per_row)
+        y_offset = size * (index % cards_per_row)
+        new_image[
+          x_offset:x_offset+size, y_offset:y_offset+size, :channels] = warp
 
     cv2.imshow('preview', new_image)
 
