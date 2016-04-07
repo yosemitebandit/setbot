@@ -15,10 +15,12 @@ number_of_cards = 18
 cards_per_row = number_of_cards / 3
 cards_per_col = 3
 channels = 3
-size = 150
+aspect_ratio = 0.64
+width = 150
+height = int(width / aspect_ratio)
 new_image = np.zeros(
-  (size*cards_per_col, size*cards_per_row, channels), np.uint8)
-h = np.array([[0, 0], [size, 0], [size, size], [0, size]], np.float32)
+  (height*cards_per_col, width*cards_per_row, channels), np.uint8)
+h = np.array([[0, 0], [width, 0], [width, height], [0, height]], np.float32)
 
 while True:
   # Show in preview window.
@@ -38,14 +40,23 @@ while True:
     contours = sorted(
       contours, key=cv2.contourArea, reverse=True)[0:number_of_cards]
 
+    # cv2.drawContours(frame, contours, -1, (0,255,0), 3)
+
     # Sort contours by distance from top left.
     rectangles, nw_corners = [], []
     for contour in contours:
       rect = cv2.minAreaRect(contour)
-      rotated = list(rect)
-      rotated[2] = 90
-      rect = tuple(rotated)
+
+      # Rotate.. :/
+      # rotated = list(rect)
+      # rotated[2] = 90
+      # rect = tuple(rotated)
+
       points = np.array(cv2.cv.BoxPoints(rect), np.float32)
+
+      # c1, c2 = tuple(points[0]), tuple(points[2])
+      # cv2.rectangle(frame, c1, c2, (0, 255, 0), 3)
+
       rectangles.append(points)
       # Find NW corner.
       west_points = sorted(points, key=lambda p: p[0])[:2]
@@ -69,11 +80,11 @@ while True:
         if corner not in points:
           continue
         transform = cv2.getPerspectiveTransform(points, h)
-        warp = cv2.warpPerspective(frame, transform, (size, size))
-        x_offset = size * (index / cards_per_row)
-        y_offset = size * (index % cards_per_row)
-        new_image[
-          x_offset:x_offset+size, y_offset:y_offset+size, :channels] = warp
+        warp = cv2.warpPerspective(frame, transform, (width, height))
+        x_offset = height * (index / cards_per_row)
+        y_offset = width * (index % cards_per_row)
+        new_image[x_offset:x_offset + height, y_offset:y_offset + width,
+                  :channels] = warp
 
     cv2.imshow('preview', new_image)
 
