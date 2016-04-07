@@ -20,7 +20,7 @@ width = 150
 height = int(width / aspect_ratio)
 new_image = np.zeros(
   (height*cards_per_col, width*cards_per_row, channels), np.uint8)
-h = np.array([[0, 0], [width, 0], [width, height], [0, height]], np.float32)
+h = np.array([[0, height], [0, 0], [width, 0], [width, height]], np.float32)
 
 while True:
   # Show in preview window.
@@ -46,18 +46,12 @@ while True:
     rectangles, nw_corners = [], []
     for contour in contours:
       rect = cv2.minAreaRect(contour)
-
-      # Rotate.. :/
-      # rotated = list(rect)
-      # rotated[2] = 90
-      # rect = tuple(rotated)
-
       points = np.array(cv2.cv.BoxPoints(rect), np.float32)
+      rectangles.append(points)
 
       # c1, c2 = tuple(points[0]), tuple(points[2])
       # cv2.rectangle(frame, c1, c2, (0, 255, 0), 3)
 
-      rectangles.append(points)
       # Find NW corner.
       west_points = sorted(points, key=lambda p: p[0])[:2]
       north_points = sorted(west_points, key=lambda p: p[1])
