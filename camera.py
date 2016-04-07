@@ -1,8 +1,12 @@
 """Card isolation test."""
 
+import os
+import random
 import time
+
 import cv2
 import numpy as np
+from PIL import Image
 
 
 cv2.namedWindow('preview')
@@ -14,21 +18,45 @@ rval, frame = vc.read()
 area_difference_threshold = 0.2
 max_number_of_cards = 18
 cards_per_col = 3
+max_number_of_cols = max_number_of_cards / cards_per_col
 channels = 3
 aspect_ratio = 0.64
-width = 150
+width = 80
 height = int(width / aspect_ratio)
-h = np.array([[0, height], [0, 0], [width, 0], [width, height]], np.float32)
+transform_matrix  = np.array(
+  [[0, height], [0, 0], [width, 0], [width, height]], np.float32)
 
+# Load the card images.  OpenCV uses BGR so we have to convert.
+input_directory = 'card-images'
+original_card_width, original_card_height = 352, 550
+rendered_card_data = {}
+for filename in os.listdir(input_directory):
+  name = filename.split('.')[0]
+  path = os.path.join(input_directory, filename)
+  image = Image.open(path)
+  r, g, b, _ = image.split()
+  image = Image.merge('RGB', (b, g, r))
+  image = image.crop((0, 0, original_card_width, original_card_height))
+  image = image.resize((width, height), resample=Image.ANTIALIAS)
+  rendered_card_data[name] = np.array(image)
+
+# Setup the output image.
+output_image_width = height * cards_per_col
+display_width_buffer = width
+output_image_height = (width * max_number_of_cols +
+                       display_width_buffer +
+                       width * max_number_of_cols +
+                       width)
+
+# Start the camera.
 while True:
   # Show in preview window.
   if frame is not None:
 
-    # Set threshold from slider.
+    # Set white threshold from slider.
     sensitivity = cv2.getTrackbarPos('sensitivity', 'preview')
     lower_white = np.array([0, 0, 255-sensitivity])
     upper_white = np.array([255, sensitivity, 255])
-
 
     hsv_img = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     thresh = cv2.inRange(hsv_img, lower_white, upper_white)
@@ -36,6 +64,7 @@ while True:
     contours, _ = cv2.findContours(
       thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
+    # Start guessing how many cards are visible.
     first_six_contours = sorted(
       contours, key=cv2.contourArea, reverse=True)[0:6]
     areas = map(cv2.contourArea, first_six_contours)
@@ -53,17 +82,15 @@ while True:
 
     number_of_cards = len(contours)
     cards_per_row = number_of_cards / cards_per_col
-    max_number_of_cols = max_number_of_cards / cards_per_col
-    new_image = np.zeros(
-      (height*cards_per_col, width*max_number_of_cols, channels), np.uint8)
-    print 'sensitivity: %s, cards: %s' % (sensitivity, number_of_cards)
+    output_image = np.zeros(
+      (output_image_width, output_image_height, channels), np.uint8)
 
-    #contours = sorted(
-    #  contours, key=cv2.contourArea, reverse=True)[0:number_of_cards]
+    print 'sensitivity: %s, cards: %s' % (sensitivity, number_of_cards)
 
     # cv2.drawContours(frame, contours, -1, (0,255,0), 3)
 
-    # Sort contours by distance from top left.
+    # Sort contours by distance from top left so we can display the cards in
+    # order.
     rectangles, nw_corners = [], []
     for contour in contours:
       rect = cv2.minAreaRect(contour)
@@ -90,22 +117,34 @@ while True:
     top_row.extend(bottom_row)
     ordered_corners = top_row
 
+    # Draw the cards as the camera sees them.
     for index, corner in enumerate(ordered_corners):
       for points in rectangles:
         if corner not in points:
           continue
-        transform = cv2.getPerspectiveTransform(points, h)
+        transform = cv2.getPerspectiveTransform(points, transform_matrix)
         warp = cv2.warpPerspective(frame, transform, (width, height))
         x_offset = height * (index / cards_per_row)
         y_offset = width * (index % cards_per_row)
-        new_image[x_offset:x_offset + height, y_offset:y_offset + width,
+        output_image[x_offset:x_offset + height, y_offset:y_offset + width,
                   :channels] = warp
 
-    cv2.imshow('preview', new_image)
+    # Draw the estimate.
+    for index in range(len(ordered_corners)):
+      name = random.choice(rendered_card_data.keys())
+      data = rendered_card_data[name]
+      x_offset = height * (index / cards_per_row)
+      y_offset = (max_number_of_cols * width +
+                  display_width_buffer +
+                  width * (index % cards_per_row))
+      output_image[x_offset:x_offset + height, y_offset:y_offset + width,
+                :channels] = data
+
+    cv2.imshow('preview', output_image)
 
 
   # Save.
-  cv2.imwrite('/tmp/out.png', new_image)
+  cv2.imwrite('/tmp/out.png', output_image)
 
   # Capture another.
   rval, frame = vc.read()
