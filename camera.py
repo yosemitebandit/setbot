@@ -7,30 +7,34 @@ import numpy as np
 
 cv2.namedWindow('preview')
 cv2.createTrackbar('sensitivity', 'preview', 80, 255, lambda x: x)
+cv2.createTrackbar('columns', 'preview', 3, 6, lambda x: x)
 
 vc = cv2.VideoCapture(0)
 rval, frame = vc.read()
 
-number_of_cards = 18
-cards_per_row = number_of_cards / 3
 cards_per_col = 3
 channels = 3
 aspect_ratio = 0.64
 width = 150
 height = int(width / aspect_ratio)
-new_image = np.zeros(
-  (height*cards_per_col, width*cards_per_row, channels), np.uint8)
 h = np.array([[0, height], [0, 0], [width, 0], [width, height]], np.float32)
 
 while True:
   # Show in preview window.
   if frame is not None:
 
-    # Set threshold.
+    # Get the number of columns from the slider.
+    cards_per_row = cv2.getTrackbarPos('columns', 'preview')
+    number_of_cards = cards_per_row * 3
+    new_image = np.zeros(
+      (height*cards_per_col, width*cards_per_row, channels), np.uint8)
+
+    # Set threshold from slider.
     sensitivity = cv2.getTrackbarPos('sensitivity', 'preview')
     lower_white = np.array([0, 0, 255-sensitivity])
     upper_white = np.array([255, sensitivity, 255])
-    print sensitivity
+
+    print 'sensitivity: %s, columns: %s' % (sensitivity, cards_per_row)
 
     hsv_img = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     thresh = cv2.inRange(hsv_img, lower_white, upper_white)
