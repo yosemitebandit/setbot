@@ -36,6 +36,7 @@ and save screenshots (see `download_cards.py`)
 * make sure the test set has an even distribution of classes (ala CIFAR-10)
 * adjust colors via the site
 * need a larger board -- see sketch
+* print stuff on the right sidebar in the camera output
 
 
 #### rules of set
