@@ -34,6 +34,7 @@ and save screenshots (see `download_cards.py`)
 * count correct features in evaluator
 * make one network for all 81 cards?
 * make sure the test set has an even distribution of classes (ala CIFAR-10)
+* make the cards smaller?
 * adjust colors via the site
 * need a larger board -- see sketch
 * print stuff on the right sidebar in the camera output
