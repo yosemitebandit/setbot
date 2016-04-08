@@ -41,21 +41,21 @@ image_channels = 3
 print 'loading data..'
 input_directory = 'rgba-data'
 number_of_samples = len(os.listdir(input_directory))
-X = np.zeros((number_of_samples, image_rows * image_cols * image_channels))
+X = np.zeros((number_of_samples, image_channels, image_rows, image_cols))
 y = np.zeros((number_of_samples,))
 for index, filename in enumerate(os.listdir(input_directory)):
   path = os.path.join(input_directory, filename)
-  X[index, :] = np.load(path)
+  X[index, :, :, :] = np.load(path)
   characteristics = filename.split('-')[0:4]
   simple_name = '-'.join(characteristics)
   y[index] = labels[simple_name]
 
 # Divide into training / test splits.
 split_index = int(test_proportion * number_of_samples)
-X_train = X[0:split_index]
-y_train = y[0:split_index]
-X_test = X[split_index:]
-y_test = y[split_index:]
+X_test = X[0:split_index]
+y_test = y[0:split_index]
+X_train = X[split_index:]
+y_train = y[split_index:]
 print 'X_train shape:', X_train.shape
 print X_train.shape[0], 'train samples'
 print X_test.shape[0], 'test samples'
@@ -67,7 +67,7 @@ Y_test = np_utils.to_categorical(y_test, nb_classes)
 model = Sequential()
 
 model.add(Convolution2D(32, 3, 3, border_mode='same',
-                        input_shape=(img_channels, img_rows, img_cols)))
+                        input_shape=(image_channels, image_rows, image_cols)))
 model.add(Activation('relu'))
 model.add(Convolution2D(32, 3, 3))
 model.add(Activation('relu'))
