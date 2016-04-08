@@ -37,6 +37,7 @@ and save screenshots (see `download_cards.py`)
 * adjust colors via the site
 * need a larger board -- see sketch
 * print stuff on the right sidebar in the camera output
+* try [keras](http://keras.io), especially the `ImageDataGenerator`
 
 
 #### rules of set
