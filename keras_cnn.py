@@ -37,9 +37,11 @@ image_rows, image_cols = card_height, card_width
 image_channels = 3
 
 # Output params.
-base_architecture_filename = 'setbot-cnn-model-architecture'
-base_weights_filename = 'setbot-cnn-weights'
-base_loss_history_filename = 'setbot-cnn-loss-history'
+model_output_dir = '/var/models-for-setbot/keras-cnn'
+base_architecture_filename = 'architecture'
+base_weights_filename = 'weights'
+loss_history_output_dir = '/tmp'
+base_loss_history_filename = 'loss-history'
 
 # Setup data and labels.
 # todo: shuffle?
@@ -102,27 +104,34 @@ X_test = X_test.astype('float32')
 X_train /= 255
 X_test /= 255
 
-# Prepare to save architecture, weights and loss history.
+# Save model architecture.
 model_architecture = model.to_json()
-architecture_filepath = '/tmp/%s.json' % base_architecture_filename
+architecture_filename = '%s.json' % base_architecture_filename
+architecture_filepath = os.path.join(model_output_dir, architecture_filename)
 with open(architecture_filepath, 'w') as model_file:
   model_file.write(model_architecture)
-weights_filepath = '/tmp/%s.{epoch:02d}-{val_loss:.2f}.h5' % base_weights_filename
-weight_saver = ModelCheckpoint(
-  filepath=weights_filepath, verbose=1, save_best_only=True)
 
+# Prepare to save weights.
+weights_filename = '%s.{epoch:03d}-{val_loss:.2f}.h5' % base_weights_filename
+weights_filepath = os.path.join(model_output_dir, weights_filename)
+weight_saver = ModelCheckpoint(filepath=weights_filepath, verbose=1)
+
+# Save loss every epoch.
 class LossHistory(Callback):
   def on_train_begin(self, logs={}):
     self.losses = []
 
   def on_batch_end(self, batch, logs={}):
-    self.losses.append(logs.get('loss'))
+    self.losses.append(float(logs.get('loss')))
 
   def on_epoch_end(self, epoch, logs={}):
     loss_history_data = json.dumps(self.losses)
-    loss_history_filepath = '/tmp/%s.json' % base_loss_history_filename
-    print 'saving loss history in "%s"' % loss_history_filepath
-    with open(loss_history_filepath) as loss_history_file:
+    loss_history_filename = '%s.epoch:%03d.json' % (
+      base_loss_history_filename, epoch)
+    loss_history_filepath = os.path.join(
+      loss_history_output_dir, loss_history_filename)
+    print 'saving loss history to "%s"' % loss_history_filepath
+    with open(loss_history_filepath, 'w') as loss_history_file:
       loss_history_file.write(loss_history_data)
 
 history_saver = LossHistory()
