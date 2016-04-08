@@ -3,14 +3,12 @@
 
 import os
 
-from keras.datasets import cifar10
 from keras.models import Sequential
 from keras.layers.core import Dense, Dropout, Activation, Flatten
 from keras.layers.convolutional import Convolution2D, MaxPooling2D
 from keras.optimizers import SGD
 from keras.utils import np_utils
 import numpy as np
-from PIL import Image
 
 
 # Seed RNG.
@@ -60,7 +58,7 @@ print 'X_train shape:', X_train.shape
 print X_train.shape[0], 'train samples'
 print X_test.shape[0], 'test samples'
 
-# convert class vectors to binary class matrices
+# Convert class vectors to binary class matrices.
 Y_train = np_utils.to_categorical(y_train, nb_classes)
 Y_test = np_utils.to_categorical(y_test, nb_classes)
 
@@ -88,7 +86,7 @@ model.add(Dropout(0.5))
 model.add(Dense(nb_classes))
 model.add(Activation('softmax'))
 
-# let's train the model using SGD + momentum (how original).
+# Train.
 sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
 model.compile(loss='categorical_crossentropy', optimizer=sgd)
 
