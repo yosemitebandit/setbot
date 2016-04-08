@@ -39,10 +39,6 @@ and save screenshots (see `download_cards.py`)
   * adjust colors (via the site?)
   * bring back intensification?
   * consider shrinking the cards
-* improvements to the keras test:
-  * save the model
-  * think about using a different optimizer
-  * look at other params in `model.fit` and `model.compile`
 
 
 #### rules of set
