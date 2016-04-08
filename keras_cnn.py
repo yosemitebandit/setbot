@@ -1,12 +1,14 @@
 """Train a simple deep CNN on the CIFAR10 small images dataset.
 """
 
+import json
 import os
 
-from keras.models import Sequential
+from keras.callbacks import ModelCheckpoint, Callback
 from keras.layers.core import Dense, Dropout, Activation, Flatten
 from keras.layers.convolutional import Convolution2D, MaxPooling2D
-from keras.optimizers import SGD
+from keras.models import Sequential
+from keras.optimizers import SGD, Adam
 from keras.utils import np_utils
 import numpy as np
 
@@ -33,6 +35,11 @@ aspect_ratio = 0.64
 card_height = int(card_width / aspect_ratio)  # 78
 image_rows, image_cols = card_height, card_width
 image_channels = 3
+
+# Output params.
+architecture_filepath = '/tmp/setbot-cnn-model-architecture.json'
+weights_filepath = '/tmp/setbot-cnn-weights.h5'
+loss_history_filepath = '/tmp/setbot-cnn-loss-history.h5'
 
 # Setup data and labels.
 # todo: shuffle?
@@ -86,8 +93,8 @@ model.add(Dropout(0.5))
 model.add(Dense(nb_classes))
 model.add(Activation('softmax'))
 
-# Train.
 sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+#adam = Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08)
 model.compile(loss='categorical_crossentropy', optimizer=sgd)
 
 X_train = X_train.astype('float32')
@@ -95,6 +102,32 @@ X_test = X_test.astype('float32')
 X_train /= 255
 X_test /= 255
 
-model.fit(X_train, Y_train, batch_size=batch_size,
-          nb_epoch=nb_epoch, show_accuracy=True,
-          validation_data=(X_test, Y_test), shuffle=True)
+# Prepare to save architecture, weights and loss history.
+model_architecture = model.to_json()
+with open(architecture_filepath, 'w') as model_file:
+  model_file.write(model_architecture)
+base_weights_filepath = weights_filepath.split('.')[0]
+weights_filepath = '%s.{epoch:02d}-{val_loss:.2f}.h5' % base_weights_filepath
+weight_saver = ModelCheckpoint(
+  filepath=weights_filepath, verbose=1, save_best_only=True)
+
+class LossHistory(Callback):
+  def on_train_begin(self, logs={}):
+    self.losses = []
+
+  def on_batch_end(self, batch, logs={}):
+    self.losses.append(logs.get('loss'))
+
+  def on_epoch_end(self, epoch, logs={}):
+    print 'saving loss history in "%s"' % loss_history_filepath
+    loss_history_data = json.dumps(self.losses)
+    with open(loss_history_filepath) as loss_history_file:
+      loss_history_file.write(loss_history_data)
+
+history_saver = LossHistory()
+
+
+# Train.
+model.fit(X_train, Y_train, batch_size=batch_size, nb_epoch=nb_epoch,
+          show_accuracy=True, validation_data=(X_test, Y_test), shuffle=True,
+          callbacks=[weight_saver, history_saver])
