@@ -39,6 +39,9 @@ and save screenshots (see `download_cards.py`)
   * adjust colors (via the site?)
   * bring back intensification?
   * consider shrinking the cards
+* improvements to the keras test
+  * consider going back to four simple, feature-based models if CNN is too slow
+  * loading and evaluation in `camera.py`
 
 
 #### rules of set
