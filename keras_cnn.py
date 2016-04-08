@@ -37,9 +37,9 @@ image_rows, image_cols = card_height, card_width
 image_channels = 3
 
 # Output params.
-architecture_filepath = '/tmp/setbot-cnn-model-architecture.json'
-weights_filepath = '/tmp/setbot-cnn-weights.h5'
-loss_history_filepath = '/tmp/setbot-cnn-loss-history.h5'
+base_architecture_filename = 'setbot-cnn-model-architecture'
+base_weights_filename = 'setbot-cnn-weights'
+base_loss_history_filename = 'setbot-cnn-loss-history'
 
 # Setup data and labels.
 # todo: shuffle?
@@ -104,10 +104,10 @@ X_test /= 255
 
 # Prepare to save architecture, weights and loss history.
 model_architecture = model.to_json()
+architecture_filepath = '/tmp/%s.json' % base_architecture_filename
 with open(architecture_filepath, 'w') as model_file:
   model_file.write(model_architecture)
-base_weights_filepath = weights_filepath.split('.')[0]
-weights_filepath = '%s.{epoch:02d}-{val_loss:.2f}.h5' % base_weights_filepath
+weights_filepath = '/tmp/%s.{epoch:02d}-{val_loss:.2f}.h5' % base_weights_filename
 weight_saver = ModelCheckpoint(
   filepath=weights_filepath, verbose=1, save_best_only=True)
 
@@ -119,8 +119,9 @@ class LossHistory(Callback):
     self.losses.append(logs.get('loss'))
 
   def on_epoch_end(self, epoch, logs={}):
-    print 'saving loss history in "%s"' % loss_history_filepath
     loss_history_data = json.dumps(self.losses)
+    loss_history_filepath = '/tmp/%s.json' % base_loss_history_filename
+    print 'saving loss history in "%s"' % loss_history_filepath
     with open(loss_history_filepath) as loss_history_file:
       loss_history_file.write(loss_history_data)
 
