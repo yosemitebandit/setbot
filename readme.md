@@ -42,6 +42,7 @@ and save screenshots (see `download_cards.py`)
 * improvements to the keras test
   * consider going back to four simple, feature-based models if CNN is too slow
   * loading and evaluation in `camera.py`
+* consider GPU hosts -- dominodatalab or rescale
 
 
 #### rules of set
