@@ -43,6 +43,7 @@ and save screenshots (see `download_cards.py`)
   * consider going back to four simple, feature-based models if CNN is too slow
   * loading and evaluation in `camera.py`
 * consider GPU hosts -- dominodatalab or rescale
+* use `np.transpose` like [this post](https://blog.rescale.com/neural-networks-using-keras-on-rescale/)?
 
 
 #### rules of set
