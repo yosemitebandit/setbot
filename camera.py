@@ -5,13 +5,27 @@ import random
 import time
 
 import cv2
+from keras.models import model_from_json
 import numpy as np
 from PIL import Image
 
 
+# Load the model.
+architecture_path = '/var/models-for-setbot/keras-cnn/architecture.json'
+weights_path = '/var/models-for-setbot/keras-cnn/weights.hdf5'
+print 'loading model..'
+with open(architecture_path) as architecture_file:
+  model = model_from_json(architecture_file.read())
+model.load_weights(weights_path)
+print 'done.'
+
+# Setup labels.
+filename_labels = [f.split('.')[0] for f in os.listdir('card-images')]
+filename_labels.sort()
+
+
 cv2.namedWindow('preview')
 cv2.createTrackbar('sensitivity', 'preview', 150, 255, lambda x: x)
-
 vc = cv2.VideoCapture(0)
 rval, frame = vc.read()
 
@@ -21,8 +35,9 @@ cards_per_col = 3
 max_number_of_cols = max_number_of_cards / cards_per_col
 channels = 3
 aspect_ratio = 0.64
-width = 80
+width = 50
 height = int(width / aspect_ratio)
+image_rows, image_cols = height, width
 transform_matrix  = np.array(
   [[0, height], [0, 0], [width, 0], [width, height]], np.float32)
 
@@ -117,6 +132,8 @@ while True:
     top_row.extend(bottom_row)
     ordered_corners = top_row
 
+    X = np.zeros((number_of_cards, channels, image_rows, image_cols))
+
     # Draw the cards as the camera sees them.
     for index, corner in enumerate(ordered_corners):
       for points in rectangles:
@@ -127,18 +144,25 @@ while True:
         x_offset = height * (index / cards_per_row)
         y_offset = width * (index % cards_per_row)
         output_image[x_offset:x_offset + height, y_offset:y_offset + width,
-                  :channels] = warp
+                     :channels] = warp
+        X[index, :, :, :] = np.transpose(warp, (2, 0, 1)).astype(np.float32)
+
+    X /= 255
+    prediction = model.predict_classes(X, verbose=False)
+    predicted_names = [filename_labels[i] for i in prediction]
 
     # Draw the estimate.
-    for index in range(len(ordered_corners)):
-      name = random.choice(rendered_card_data.keys())
+    for index, name in enumerate(predicted_names):
       data = rendered_card_data[name]
       x_offset = height * (index / cards_per_row)
       y_offset = (max_number_of_cols * width +
                   display_width_buffer +
                   width * (index % cards_per_row))
-      output_image[x_offset:x_offset + height, y_offset:y_offset + width,
-                :channels] = data
+      try:
+        output_image[x_offset:x_offset + height, y_offset:y_offset + width,
+                    :channels] = data
+      except ValueError:
+        continue
 
     cv2.imshow('preview', output_image)
 
@@ -154,4 +178,4 @@ while True:
     break
 
   # Wait.
-  time.sleep(0.1)
+  #time.sleep(0.1)
