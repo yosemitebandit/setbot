@@ -1,4 +1,4 @@
-"""Card isolation test."""
+"""Card isolation and prediction."""
 
 import os
 import time
@@ -22,11 +22,11 @@ print 'done.'
 filename_labels = [f.split('.')[0] for f in os.listdir('card-images')]
 filename_labels.sort()
 
-
+# Setup display and what to show -- the 'frame' or 'prediction'
+display_mode = 'prediction'
 cv2.namedWindow('preview')
 cv2.createTrackbar('sensitivity', 'preview', 150, 255, lambda x: x)
 vc = cv2.VideoCapture(0)
-rval, frame = vc.read()
 
 area_difference_threshold = 0.2
 max_number_of_cards = 18
@@ -42,7 +42,8 @@ transform_matrix = np.array(
 output_card_width = 100
 output_card_height = int(output_card_width / aspect_ratio)
 
-# Load the card images.  OpenCV uses BGR so we have to convert.
+# Load the synthetic card images.  OpenCV uses BGR so we have to convert.
+print 'loading synthetic data..'
 input_directory = 'card-images'
 original_card_width, original_card_height = 352, 550
 rendered_card_data = {}
@@ -55,8 +56,9 @@ for filename in os.listdir(input_directory):
   image = image.crop((0, 0, original_card_width, original_card_height))
   image = image.resize((width, height), resample=Image.ANTIALIAS)
   rendered_card_data[name] = np.array(image)
+print 'done.'
 
-# Setup the output image.
+# Setup the output image for the OpenCV window.
 output_image_width = output_card_height * cards_per_col
 display_width_buffer = output_card_width
 output_image_height = (output_card_width * max_number_of_cols +
@@ -66,9 +68,9 @@ output_image_height = (output_card_width * max_number_of_cols +
 
 # Start the camera.
 while True:
-  # Show in preview window.
-  if frame is not None:
+  _, frame = vc.read()
 
+  if frame is not None:
     # Get time for fps.
     now = time.time()
 
@@ -93,23 +95,26 @@ while True:
 
     possible_contours = sorted(
       contours, key=cv2.contourArea, reverse=True)[0:max_number_of_cards]
-    contours = []
+    card_contours = []
     for contour in possible_contours:
       diff = abs((cv2.contourArea(contour) - median_area) / median_area)
       if diff < area_difference_threshold:
-        contours.append(contour)
+        card_contours.append(contour)
 
-    number_of_cards = len(contours)
+    number_of_cards = len(card_contours)
     cards_per_row = number_of_cards / cards_per_col
-    output_image = np.zeros(
-      (output_image_width, output_image_height, channels), np.uint8)
-
-    # cv2.drawContours(frame, contours, -1, (0,255,0), 3)
+    if number_of_cards == 0 or cards_per_row == 0:
+      print 'not enough cards in view..'
+      blank_image = np.zeros(
+        (output_image_width, output_image_height, channels), np.uint8)
+      cv2.imshow('preview', blank_image)
+      time.sleep(0.2)
+      continue
 
     # Sort contours by distance from top left so we can display the cards in
     # order.
     rectangles, nw_corners = [], []
-    for contour in contours:
+    for contour in card_contours:
       rect = cv2.minAreaRect(contour)
       points = np.array(cv2.cv.BoxPoints(rect), np.float32)
       rectangles.append(points)
@@ -122,21 +127,23 @@ while True:
       north_points = sorted(west_points, key=lambda p: p[1])
       nw_corners.append(north_points[0])
 
-    nw_corners = sorted(
-      nw_corners, key=lambda p: p[1], reverse=True)
-    top_row = sorted(
-      nw_corners[0:cards_per_row], key=lambda p: p[0], reverse=True)
+    nw_corners = sorted(nw_corners, key=lambda p: p[1], reverse=True)
+    top_row = sorted(nw_corners[0:cards_per_row], key=lambda p: p[0],
+                     reverse=True)
     middle_row = sorted(nw_corners[cards_per_row:2*cards_per_row],
                         key=lambda p: p[0], reverse=True)
     bottom_row = sorted(nw_corners[2*cards_per_row:3*cards_per_row],
                         key=lambda p: p[0], reverse=True)
-    top_row.extend(middle_row)
-    top_row.extend(bottom_row)
-    ordered_corners = top_row
+    ordered_corners = []
+    ordered_corners.extend(top_row)
+    ordered_corners.extend(middle_row)
+    ordered_corners.extend(bottom_row)
 
+    # Draw the cards as the camera sees them and capture input data for the
+    # classifier.
+    output_image = np.zeros(
+      (output_image_width, output_image_height, channels), np.uint8)
     X = np.zeros((number_of_cards, channels, image_rows, image_cols))
-
-    # Draw the cards as the camera sees them.
     for index, corner in enumerate(ordered_corners):
       for points in rectangles:
         if corner not in points:
@@ -148,9 +155,11 @@ while True:
           (output_card_width, output_card_height), resample=Image.ANTIALIAS)
         x_offset = output_card_height * (index / cards_per_row)
         y_offset = output_card_width * (index % cards_per_row)
-        output_image[x_offset:x_offset + output_card_height,
-                     y_offset:y_offset + output_card_width,
-                     :channels] = output_card_data
+        output_image[
+          x_offset:x_offset + output_card_height,
+          y_offset:y_offset + output_card_width,
+          :channels
+        ] = output_card_data
 
     X /= 255
     prediction = model.predict_classes(X, verbose=False)
@@ -165,21 +174,28 @@ while True:
                   display_width_buffer +
                   output_card_width * (index % cards_per_row))
       try:
-        output_image[x_offset:x_offset + output_card_height,
-                     y_offset:y_offset + output_card_width,
-                     :channels] = data
+        output_image[
+          x_offset:x_offset + output_card_height,
+          y_offset:y_offset + output_card_width,
+          :channels
+        ] = data
       except ValueError:
         continue
 
-    cv2.imshow('preview', output_image)
 
     elapsed = time.time() - now
     fps = 1. / elapsed
     print 'sensitivity: %s, cards: %s, fps: %0.2f' % (
       sensitivity, number_of_cards, fps)
 
-  # Save.
-  cv2.imwrite('/tmp/out.png', output_image)
+    # Display and save.
+    if display_mode == 'frame':
+      cv2.drawContours(frame, card_contours, -1, (0, 255, 0), 2)
+      cv2.imshow('preview', frame)
+      cv2.imwrite('/tmp/camera-frame.png', frame)
+    elif display_mode == 'prediction':
+      cv2.imshow('preview', output_image)
+      cv2.imwrite('/tmp/model-and-prediction.png', output_image)
 
   # Capture another.
   rval, frame = vc.read()
@@ -187,6 +203,3 @@ while True:
   # Break on 'q'.
   if cv2.waitKey(1) & 0xFF == ord('q'):
     break
-
-  # Wait.
-  #time.sleep(0.1)
