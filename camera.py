@@ -1,13 +1,13 @@
 """Card isolation test."""
 
 import os
-import random
 import time
 
 import cv2
 from keras.models import model_from_json
 import numpy as np
 from PIL import Image
+import scipy.misc
 
 
 # Load the model.
@@ -38,8 +38,10 @@ aspect_ratio = 0.64
 width = 50
 height = int(width / aspect_ratio)
 image_rows, image_cols = height, width
-transform_matrix  = np.array(
+transform_matrix = np.array(
   [[0, height], [0, 0], [width, 0], [width, height]], np.float32)
+output_card_width = 100
+output_card_height = int(output_card_width / aspect_ratio)
 
 # Load the card images.  OpenCV uses BGR so we have to convert.
 input_directory = 'card-images'
@@ -56,12 +58,12 @@ for filename in os.listdir(input_directory):
   rendered_card_data[name] = np.array(image)
 
 # Setup the output image.
-output_image_width = height * cards_per_col
-display_width_buffer = width
-output_image_height = (width * max_number_of_cols +
+output_image_width = output_card_height * cards_per_col
+display_width_buffer = output_card_width
+output_image_height = (output_card_width * max_number_of_cols +
                        display_width_buffer +
-                       width * max_number_of_cols +
-                       width)
+                       output_card_width * max_number_of_cols +
+                       output_card_width)
 
 # Start the camera.
 while True:
@@ -141,11 +143,14 @@ while True:
           continue
         transform = cv2.getPerspectiveTransform(points, transform_matrix)
         warp = cv2.warpPerspective(frame, transform, (width, height))
-        x_offset = height * (index / cards_per_row)
-        y_offset = width * (index % cards_per_row)
-        output_image[x_offset:x_offset + height, y_offset:y_offset + width,
-                     :channels] = warp
         X[index, :, :, :] = np.transpose(warp, (2, 0, 1)).astype(np.float32)
+        output_card_data = scipy.misc.imresize(
+          warp, (output_card_height, output_card_width), interp='bicubic')
+        x_offset = output_card_height * (index / cards_per_row)
+        y_offset = output_card_width * (index % cards_per_row)
+        output_image[x_offset:x_offset + output_card_height,
+                     y_offset:y_offset + output_card_width,
+                     :channels] = output_card_data
 
     X /= 255
     prediction = model.predict_classes(X, verbose=False)
@@ -153,14 +158,17 @@ while True:
 
     # Draw the estimate.
     for index, name in enumerate(predicted_names):
-      data = rendered_card_data[name]
-      x_offset = height * (index / cards_per_row)
-      y_offset = (max_number_of_cols * width +
+      data = scipy.misc.imresize(rendered_card_data[name],
+                                 (output_card_height, output_card_width),
+                                 interp='cubic')
+      x_offset = output_card_height * (index / cards_per_row)
+      y_offset = (max_number_of_cols * output_card_width +
                   display_width_buffer +
-                  width * (index % cards_per_row))
+                  output_card_width * (index % cards_per_row))
       try:
-        output_image[x_offset:x_offset + height, y_offset:y_offset + width,
-                    :channels] = data
+        output_image[x_offset:x_offset + output_card_height,
+                     y_offset:y_offset + output_card_width,
+                     :channels] = data
       except ValueError:
         continue
 
