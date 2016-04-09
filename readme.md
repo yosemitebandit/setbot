@@ -44,6 +44,11 @@ and save screenshots (see `download_cards.py`)
   * loading and evaluation in `camera.py`
 * consider GPU hosts -- dominodatalab or rescale
 * use `np.transpose` like [this post](https://blog.rescale.com/neural-networks-using-keras-on-rescale/)?
+* vgg
+  * get it [here](https://gist.github.com/baraldilorenzo/07d7802847aaad0a35d3)
+  * set `trainable=False` for the first few, non-Dense layers
+  * add a few more layers for my stuff
+  * load the weights and train some more..
 
 
 #### rules of set
