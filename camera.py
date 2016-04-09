@@ -7,7 +7,6 @@ import cv2
 from keras.models import model_from_json
 import numpy as np
 from PIL import Image
-import scipy.misc
 
 
 # Load the model.
@@ -144,8 +143,8 @@ while True:
         transform = cv2.getPerspectiveTransform(points, transform_matrix)
         warp = cv2.warpPerspective(frame, transform, (width, height))
         X[index, :, :, :] = np.transpose(warp, (2, 0, 1)).astype(np.float32)
-        output_card_data = scipy.misc.imresize(
-          warp, (output_card_height, output_card_width), interp='bicubic')
+        output_card_data = Image.fromarray(warp).resize(
+          (output_card_width, output_card_height), resample=Image.ANTIALIAS)
         x_offset = output_card_height * (index / cards_per_row)
         y_offset = output_card_width * (index % cards_per_row)
         output_image[x_offset:x_offset + output_card_height,
@@ -158,9 +157,8 @@ while True:
 
     # Draw the estimate.
     for index, name in enumerate(predicted_names):
-      data = scipy.misc.imresize(rendered_card_data[name],
-                                 (output_card_height, output_card_width),
-                                 interp='cubic')
+      data = Image.fromarray(rendered_card_data[name]).resize(
+        (output_card_width, output_card_height), resample=Image.ANTIALIAS)
       x_offset = output_card_height * (index / cards_per_row)
       y_offset = (max_number_of_cols * output_card_width +
                   display_width_buffer +
