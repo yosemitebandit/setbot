@@ -69,6 +69,9 @@ while True:
   # Show in preview window.
   if frame is not None:
 
+    # Get time for fps.
+    now = time.time()
+
     # Set white threshold from slider.
     sensitivity = cv2.getTrackbarPos('sensitivity', 'preview')
     lower_white = np.array([0, 0, 255-sensitivity])
@@ -100,8 +103,6 @@ while True:
     cards_per_row = number_of_cards / cards_per_col
     output_image = np.zeros(
       (output_image_width, output_image_height, channels), np.uint8)
-
-    print 'sensitivity: %s, cards: %s' % (sensitivity, number_of_cards)
 
     # cv2.drawContours(frame, contours, -1, (0,255,0), 3)
 
@@ -172,6 +173,10 @@ while True:
 
     cv2.imshow('preview', output_image)
 
+    elapsed = time.time() - now
+    fps = 1. / elapsed
+    print 'sensitivity: %s, cards: %s, fps: %0.2f' % (
+      sensitivity, number_of_cards, fps)
 
   # Save.
   cv2.imwrite('/tmp/out.png', output_image)
