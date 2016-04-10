@@ -161,7 +161,7 @@ while True:
           filepath = '/tmp/%02d.png' % index
           card_image.save(filepath)
         classifier_input[index, :, :, :] = np.transpose(bgr_card, (2, 0, 1)).astype(np.float32)
-        output_card_data = card_image.resize(
+        output_card_data = Image.fromarray(bgr_card).resize(
           (output_card_width, output_card_height), resample=Image.ANTIALIAS)
         x_offset = output_card_height * (index / cards_per_row)
         y_offset = output_card_width * (index % cards_per_row)
