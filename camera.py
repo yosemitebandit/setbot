@@ -153,14 +153,14 @@ while True:
         if corner not in points:
           continue
         transform = cv2.getPerspectiveTransform(points, transform_matrix)
-        card = cv2.warpPerspective(frame, transform, (width, height))
-        b, g, r = np.split(card, 3, axis=2)
-        new_card = np.concatenate((r, g, b), axis=2)
-        card_image = Image.fromarray(new_card)
+        bgr_card = cv2.warpPerspective(frame, transform, (width, height))
+        b, g, r = np.split(bgr_card, 3, axis=2)
+        rgb_card = np.concatenate((r, g, b), axis=2)
+        card_image = Image.fromarray(rgb_card)
         if save_individual_card_images:
           filepath = '/tmp/%02d.png' % index
           card_image.save(filepath)
-        classifier_input[index, :, :, :] = np.transpose(card, (2, 0, 1)).astype(np.float32)
+        classifier_input[index, :, :, :] = np.transpose(bgr_card, (2, 0, 1)).astype(np.float32)
         output_card_data = card_image.resize(
           (output_card_width, output_card_height), resample=Image.ANTIALIAS)
         x_offset = output_card_height * (index / cards_per_row)
