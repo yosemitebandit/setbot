@@ -22,11 +22,14 @@ print 'done.'
 filename_labels = [f.split('.')[0] for f in os.listdir('card-images')]
 filename_labels.sort()
 
-# Setup display and what to show -- the 'frame' or 'prediction'
+# Setup display and what to show -- the 'frame' or the 'prediction.'
 display_mode = 'prediction'
 cv2.namedWindow('preview')
 cv2.createTrackbar('sensitivity', 'preview', 150, 255, lambda x: x)
 vc = cv2.VideoCapture(0)
+
+# Determine whether we're saving individual card images.
+save_individual_card_images = True
 
 area_difference_threshold = 0.2
 max_number_of_cards = 18
@@ -149,9 +152,15 @@ while True:
         if corner not in points:
           continue
         transform = cv2.getPerspectiveTransform(points, transform_matrix)
-        warp = cv2.warpPerspective(frame, transform, (width, height))
-        X[index, :, :, :] = np.transpose(warp, (2, 0, 1)).astype(np.float32)
-        output_card_data = Image.fromarray(warp).resize(
+        card = cv2.warpPerspective(frame, transform, (width, height))
+        b, g, r = np.split(card, 3, axis=2)
+        new_card = np.concatenate((r, g, b), axis=2)
+        card_image = Image.fromarray(new_card)
+        if save_individual_card_images:
+          filepath = '/tmp/%02d.png' % index
+          card_image.save(filepath)
+        X[index, :, :, :] = np.transpose(card, (2, 0, 1)).astype(np.float32)
+        output_card_data = card_image.resize(
           (output_card_width, output_card_height), resample=Image.ANTIALIAS)
         x_offset = output_card_height * (index / cards_per_row)
         y_offset = output_card_width * (index % cards_per_row)
