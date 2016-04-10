@@ -12,6 +12,7 @@ from PIL import Image
 # Setup run modes.
 display_mode = 'predict'  # frame or predict
 save_individual_card_images = False
+save_preview_window = False
 
 # Load the model.
 architecture_path = '/var/models-for-setbot/keras-cnn/architecture.json'
@@ -109,9 +110,6 @@ while True:
     cards_per_row = number_of_cards / cards_per_col
     if number_of_cards == 0 or cards_per_row == 0:
       print 'not enough cards in view..'
-      blank_image = np.zeros(
-        (output_image_width, output_image_height, channels), np.uint8)
-      cv2.imshow('preview', blank_image)
       time.sleep(0.2)
       continue
 
@@ -203,10 +201,12 @@ while True:
     if display_mode == 'frame':
       cv2.drawContours(frame, card_contours, -1, (0, 255, 0), 2)
       cv2.imshow('preview', frame)
-      cv2.imwrite('/tmp/camera-frame.png', frame)
+      if save_preview_window:
+        cv2.imwrite('/tmp/camera-frame.png', frame)
     elif display_mode == 'predict':
       cv2.imshow('preview', output_image)
-      cv2.imwrite('/tmp/model-and-prediction.png', output_image)
+      if save_preview_window:
+        cv2.imwrite('/tmp/model-and-prediction.png', output_image)
 
   # Capture another.
   rval, frame = vc.read()
