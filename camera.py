@@ -9,6 +9,10 @@ import numpy as np
 from PIL import Image
 
 
+# Setup run modes.
+display_mode = 'predict'  # frame or predict
+save_individual_card_images = False
+
 # Load the model.
 architecture_path = '/var/models-for-setbot/keras-cnn/architecture.json'
 weights_path = '/var/models-for-setbot/keras-cnn/weights.hdf5'
@@ -22,15 +26,12 @@ print 'done.'
 filename_labels = [f.split('.')[0] for f in os.listdir('card-images')]
 filename_labels.sort()
 
-# Setup display and what to show -- the 'frame' or the 'prediction.'
-display_mode = 'prediction'
+# Setup display.
 cv2.namedWindow('preview')
 cv2.createTrackbar('sensitivity', 'preview', 150, 255, lambda x: x)
 vc = cv2.VideoCapture(0)
 
-# Determine whether we're saving individual card images.
-save_individual_card_images = True
-
+# Card params.
 area_difference_threshold = 0.2
 max_number_of_cards = 18
 cards_per_col = 3
@@ -192,7 +193,7 @@ while True:
       except ValueError:
         continue
 
-
+    # Print FPS and print other params.
     elapsed = time.time() - now
     fps = 1. / elapsed
     print 'sensitivity: %s, cards: %s, fps: %0.2f' % (
@@ -203,7 +204,7 @@ while True:
       cv2.drawContours(frame, card_contours, -1, (0, 255, 0), 2)
       cv2.imshow('preview', frame)
       cv2.imwrite('/tmp/camera-frame.png', frame)
-    elif display_mode == 'prediction':
+    elif display_mode == 'predict':
       cv2.imshow('preview', output_image)
       cv2.imwrite('/tmp/model-and-prediction.png', output_image)
 
