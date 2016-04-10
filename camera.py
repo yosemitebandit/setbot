@@ -146,7 +146,8 @@ while True:
     # classifier.
     output_image = np.zeros(
       (output_image_width, output_image_height, channels), np.uint8)
-    X = np.zeros((number_of_cards, channels, image_rows, image_cols))
+    classifier_input = np.zeros(
+      (number_of_cards, channels, image_rows, image_cols))
     for index, corner in enumerate(ordered_corners):
       for points in rectangles:
         if corner not in points:
@@ -159,7 +160,7 @@ while True:
         if save_individual_card_images:
           filepath = '/tmp/%02d.png' % index
           card_image.save(filepath)
-        X[index, :, :, :] = np.transpose(card, (2, 0, 1)).astype(np.float32)
+        classifier_input[index, :, :, :] = np.transpose(card, (2, 0, 1)).astype(np.float32)
         output_card_data = card_image.resize(
           (output_card_width, output_card_height), resample=Image.ANTIALIAS)
         x_offset = output_card_height * (index / cards_per_row)
@@ -170,8 +171,8 @@ while True:
           :channels
         ] = output_card_data
 
-    X /= 255
-    prediction = model.predict_classes(X, verbose=False)
+    classifier_input /= 255
+    prediction = model.predict_classes(classifier_input, verbose=False)
     predicted_names = [filename_labels[i] for i in prediction]
 
     # Draw the estimate.
