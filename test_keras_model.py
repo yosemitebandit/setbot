@@ -1,10 +1,10 @@
 """Testing the keras model.
 
 Usage:
-  test_keras_model.py <image-filepath>
+  test_keras_model.py <data-filepath>
 
 Arguments:
-  <image-filepath>  path to the scaled image
+  <data-filepath>  path to the image data
 """
 
 import os
@@ -39,16 +39,19 @@ filename_labels = [f.split('.')[0] for f in os.listdir('card-images')]
 filename_labels.sort()
 
 # Load the image and massage it into the input array.
-#image = Image.open(args['<image-filepath>'])
 X = np.zeros((1, channels, image_rows, image_cols))
-#X[0, :, :, :] = np.transpose(np.array(image), (2, 0, 1))
-X[0, :, :, :] = np.load(args['<image-filepath>'])
-
+X[0, :, :, :] = np.load(args['<data-filepath>'])
 X = X.astype('float32')
 X /= 255
 
 # Predict.
-prediction = model.predict_proba(X)[0]
+prediction = model.predict_proba(X, verbose=0)[0]
+probabilities = []
 for index, probability in enumerate(prediction):
   if probability > 0.01:
-    print '%s -> %d%%' % (filename_labels[index], 100*probability)
+    probabilities.append((filename_labels[index], probability))
+probabilities = sorted(probabilities, key=lambda p: p[1], reverse=True)
+
+# Print.
+for name, probability in probabilities:
+  print '%s -> %d%%' % (name, 100*probability)
