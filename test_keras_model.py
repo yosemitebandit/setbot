@@ -1,10 +1,10 @@
 """Testing the keras model.
 
 Usage:
-  test_keras_model.py <data-filepath>
+  test_keras_model.py <image-filepath>
 
 Arguments:
-  <data-filepath>  path to the image data
+  <image-filepath>  path to the scaled image
 """
 
 import os
@@ -40,7 +40,10 @@ filename_labels.sort()
 
 # Load the image and massage it into the input array.
 X = np.zeros((1, channels, image_rows, image_cols))
-X[0, :, :, :] = np.load(args['<data-filepath>'])
+data = np.array(Image.open(args['<image-filepath>']))
+data = data.reshape(3, image_rows, image_cols)
+#data = np.load(args['<image-filepath>'])
+X[0, :, :, :] = data
 X = X.astype('float32')
 X /= 255
 
