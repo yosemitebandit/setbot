@@ -42,7 +42,6 @@ and save screenshots (see `download_cards.py`)
   * set `trainable=False` for the first few, non-Dense layers
   * add a few more layers for my stuff
   * load the weights and train some more..
-* cli options in the camera script
 
 
 #### rules of set

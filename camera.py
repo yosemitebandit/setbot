@@ -1,18 +1,29 @@
-"""Card isolation and prediction."""
+"""Card isolation and prediction.
+
+Usage:
+  camera.py <mode> [--save-card-images] [--save-cv-window] [--camera=<source>]
+
+Arguments:
+  <mode>  show the image 'frame' (for calibration) or try to 'predict'
+
+Options:
+  --save-card-images  continuously save pngs of each isolated card
+  --save-cv-window    continuously screenshot the whole OpenCV window
+  --camera=<source>   switch between webcam and external camera [default: 0]
+"""
 
 import os
 import time
 
 import cv2
+from docopt import docopt
 from keras.models import model_from_json
 import numpy as np
 from PIL import Image
 
 
-# Setup run modes.
-display_mode = 'predict'  # frame or predict
-save_individual_card_images = False
-save_preview_window = False
+# Get args.
+args = docopt(__doc__)
 
 # Load the model.
 architecture_path = '/var/models-for-setbot/keras-cnn/architecture.json'
@@ -30,7 +41,7 @@ filename_labels.sort()
 # Setup display.
 cv2.namedWindow('preview')
 cv2.createTrackbar('sensitivity', 'preview', 150, 255, lambda x: x)
-vc = cv2.VideoCapture(0)
+vc = cv2.VideoCapture(int(args['--camera']))
 
 # Card params.
 area_difference_threshold = 0.2
@@ -156,7 +167,7 @@ while True:
         b, g, r = np.split(bgr_card, 3, axis=2)
         rgb_card = np.concatenate((r, g, b), axis=2)
         card_image = Image.fromarray(rgb_card)
-        if save_individual_card_images:
+        if args['--save-card-images']:
           filepath = '/tmp/%02d.png' % index
           card_image.save(filepath)
         data = rgb_card.reshape(3, image_rows, image_cols)
@@ -200,15 +211,15 @@ while True:
       sensitivity, number_of_cards, fps)
 
     # Display and save.
-    if display_mode == 'frame':
+    if args['<mode>'] == 'frame':
       cv2.drawContours(frame, card_contours, -1, (0, 255, 0), 2)
       cv2.imshow('preview', frame)
-      if save_preview_window:
+      if args['--save-cv-window']:
         cv2.imwrite('/tmp/camera-frame.png', frame)
-    elif display_mode == 'predict':
+    elif args['<mode>'] == 'predict':
       cv2.imshow('preview', output_image)
-      if save_preview_window:
-        cv2.imwrite('/tmp/model-and-prediction.png', output_image)
+      if args['--save-cv-window']:
+        cv2.imwrite('/tmp/perception-and-prediction.png', output_image)
 
   # Capture another.
   rval, frame = vc.read()
