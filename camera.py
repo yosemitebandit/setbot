@@ -159,7 +159,8 @@ while True:
         if save_individual_card_images:
           filepath = '/tmp/%02d.png' % index
           card_image.save(filepath)
-        classifier_input[index, :, :, :] = np.transpose(bgr_card, (2, 0, 1)).astype(np.float32)
+        data = rgb_card.reshape(3, image_rows, image_cols)
+        classifier_input[index, :, :, :] = data
         output_card_data = Image.fromarray(bgr_card).resize(
           (output_card_width, output_card_height), resample=Image.ANTIALIAS)
         x_offset = output_card_height * (index / cards_per_row)
@@ -170,6 +171,7 @@ while True:
           :channels
         ] = output_card_data
 
+    classifier_input = classifier_input.astype('float32')
     classifier_input /= 255
     prediction = model.predict_classes(classifier_input, verbose=False)
     predicted_names = [filename_labels[i] for i in prediction]
