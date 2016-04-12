@@ -30,24 +30,19 @@ and save screenshots (see `download_cards.py`)
 
 
 #### next steps
-* count correct features in evaluator
-* make sure the test set has an even distribution of classes (ala CIFAR-10)
 * need a larger board -- see sketch
 * print stuff on the right sidebar in the camera output
 * improve data generation pipeline:
   * adjust colors (via the site?)
   * bring back intensification?
   * consider shrinking the cards
-* improvements to the keras test
-  * consider going back to four simple, feature-based models if CNN is too slow
-  * loading and evaluation in `camera.py`
 * consider GPU hosts -- dominodatalab or rescale
-* use `np.transpose` like [this post](https://blog.rescale.com/neural-networks-using-keras-on-rescale/)?
 * vgg
   * get it [here](https://gist.github.com/baraldilorenzo/07d7802847aaad0a35d3)
   * set `trainable=False` for the first few, non-Dense layers
   * add a few more layers for my stuff
   * load the weights and train some more..
+* cli options in the camera script
 
 
 #### rules of set
