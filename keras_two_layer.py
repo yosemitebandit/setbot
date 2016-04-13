@@ -26,7 +26,7 @@ for index, filename in enumerate(filenames):
 batch_size = 32
 nb_classes = 81
 epochs = 200
-test_proportion = 0.1
+validation_proportion = 0.1
 
 # Image params.
 card_width = 100
@@ -42,33 +42,78 @@ base_weights_filename = 'two-layer-weights'
 loss_history_output_dir = '/tmp'
 base_loss_history_filename = 'two-layer-loss-history'
 
-# Setup data and labels.
+# Setup data and label.
 # todo: shuffle?
-print 'loading data..'
+# print 'loading data..'
+# input_directory = 'rgba-data'
+# number_of_samples = len(os.listdir(input_directory))
+# X = np.zeros((number_of_samples, image_channels, image_rows, image_cols))
+# y = np.zeros((number_of_samples,))
+# for index, filename in enumerate(os.listdir(input_directory)):
+  # path = os.path.join(input_directory, filename)
+  # X[index, :, :, :] = np.load(path)
+  # characteristics = filename.split('-')[0:4]
+  # simple_name = '-'.join(characteristics)
+  # y[index] = labels[simple_name]
+
+# Setup validation data.
 input_directory = 'rgba-data'
-number_of_samples = len(os.listdir(input_directory))
-X = np.zeros((number_of_samples, image_channels, image_rows, image_cols))
-y = np.zeros((number_of_samples,))
-for index, filename in enumerate(os.listdir(input_directory)):
-  path = os.path.join(input_directory, filename)
-  X[index, :, :, :] = np.load(path)
-  characteristics = filename.split('-')[0:4]
-  simple_name = '-'.join(characteristics)
-  y[index] = labels[simple_name]
+all_filenames = os.listdir(input_directory)
+np.random.shuffle(all_filenames)
+split_index = int(validation_proportion * len(all_filenames))
+validation_filenames = all_filenames[0:split_index]
+training_filenames = all_filenames[split_index:]
+
+
+# X_validation = np.zeros(
+  # (len(validation_filenames), image_channels, image_rows, image_cols))
+# y_validation = np.zeros((len(validation_filenames)))
+# for index, filename in enumerate(validation_filenames):
+  # path = os.path.join(input_directory, filename)
+  # X_validation[index, :, :, :] = np.load(path)
+  # characteristics = filename.split('-')[0:4]
+  # simple_name = '-'.join(characteristics)
+  # y_validation[index] = labels[simple_name]
+# X_validation = X_validation.astype('float32')
+# X_validation /= 255
+# y_validation = np_utils.to_categorical(y_validation, nb_classes)
+
+# Setup generator.
+def data_and_label_generator(filenames, samples):
+  sample_limit = len(filenames)
+  total_samples_processed = 0
+  while True:
+    if total_samples_processed + samples > sample_limit:
+      total_samples_processed = 0
+    X = np.zeros((samples, image_channels, image_rows, image_cols))
+    y = np.zeros((samples,))
+    filenames_in_batch = filenames[
+      total_samples_processed:total_samples_processed+samples]
+    for index, filename in enumerate(filenames_in_batch):
+      path = os.path.join(input_directory, filename)
+      X[index, :, :, :] = np.load(path)
+      characteristics = filename.split('-')[0:4]
+      simple_name = '-'.join(characteristics)
+      y[index] = labels[simple_name]
+    total_samples_processed += samples
+    X = X.astype('float32')
+    X /= 255
+    y = np_utils.to_categorical(y, nb_classes)
+    yield (X, y)
 
 # Divide into training / test splits.
-split_index = int(test_proportion * number_of_samples)
-X_test = X[0:split_index]
-y_test = y[0:split_index]
-X_train = X[split_index:]
-y_train = y[split_index:]
-print 'X_train shape:', X_train.shape
-print X_train.shape[0], 'train samples'
-print X_test.shape[0], 'test samples'
+# split_index = int(test_proportion * number_of_samples)
+# X_test = X[0:split_index]
+# y_test = y[0:split_index]
+# X_train = X[split_index:]
+# y_train = y[split_index:]
+# print 'X_train shape:', X_train.shape
+# print X_train.shape[0], 'train samples'
+# print X_test.shape[0], 'test samples'
 
 # Convert class vectors to binary class matrices.
-Y_train = np_utils.to_categorical(y_train, nb_classes)
-Y_test = np_utils.to_categorical(y_test, nb_classes)
+# Y_train = np_utils.to_categorical(y_train, nb_classes)
+# Y_test = np_utils.to_categorical(y_test, nb_classes)
 
 # Build the model.
 model = Sequential()
@@ -84,10 +129,10 @@ model.add(Activation('softmax'))
 sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
 model.compile(loss='categorical_crossentropy', optimizer=sgd)
 
-X_train = X_train.astype('float32')
-X_test = X_test.astype('float32')
-X_train /= 255
-X_test /= 255
+# X_train = X_train.astype('float32')
+# X_test = X_test.astype('float32')
+# X_train /= 255
+# X_test /= 255
 
 # Save model architecture.
 model_architecture = model.to_json()
@@ -123,6 +168,21 @@ history_saver = LossHistory()
 
 
 # Train.
-model.fit(X_train, Y_train, batch_size=batch_size, nb_epoch=epochs,
-          show_accuracy=True, validation_data=(X_test, Y_test), shuffle=True,
-          callbacks=[weight_saver, history_saver])
+# model.fit(X_train, Y_train, batch_size=batch_size, nb_epoch=epochs,
+          # show_accuracy=True, validation_data=(X_test, Y_test), shuffle=True,
+          # callbacks=[weight_saver, history_saver])
+
+
+samples = 100
+training_generator = data_and_label_generator(training_filenames, samples)
+validation_generator = data_and_label_generator(validation_filenames, samples)
+model.fit_generator(
+  generator=training_generator,
+  samples_per_epoch=len(training_filenames),
+  nb_epoch=epochs,
+  verbose=1,
+  show_accuracy=True,
+  validation_data=validation_generator,
+  nb_val_samples=len(validation_filenames),
+  callbacks=[weight_saver, history_saver],
+)
