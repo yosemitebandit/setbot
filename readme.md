@@ -42,6 +42,10 @@ and save screenshots (see `download_cards.py`)
   * set `trainable=False` for the first few, non-Dense layers
   * add a few more layers for my stuff
   * load the weights and train some more..
+* train on rotated / mis-scaled cards or fix the input rotation issue --
+seems fixed if each dealt card has a slight ccw rotation..
+* consider training on larger images (having issue with color / shading sometimes) --
+struggles with 1 striped diamond vs three
 
 
 #### rules of set
