@@ -21,7 +21,6 @@ jupyter==1.0.0
 jupyter-client==4.2.2
 jupyter-console==4.1.1
 jupyter-core==4.1.0
-jupyter-themes==0.1
 Keras==0.3.3
 MarkupSafe==0.23
 matplotlib==1.5.1
