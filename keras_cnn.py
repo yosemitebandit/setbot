@@ -1,5 +1,4 @@
-"""Train a simple deep CNN on the CIFAR10 small images dataset.
-"""
+"""Trains a CNN."""
 
 import json
 import os
