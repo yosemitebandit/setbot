@@ -46,6 +46,8 @@ and save screenshots (see `download_cards.py`)
 seems fixed if each dealt card has a slight ccw rotation..
 * consider training on larger images (having issue with color / shading sometimes) --
 struggles with 1 striped diamond vs three
+* on batching -- could try your generator examples for longer..
+could also just run `model.fit` with self-made batches
 
 
 #### rules of set
