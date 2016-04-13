@@ -12,6 +12,7 @@ Options:
   --camera=<source>   switch between webcam and external camera [default: 0]
 """
 
+import itertools
 import os
 import time
 
@@ -20,6 +21,8 @@ from docopt import docopt
 from keras.models import model_from_json
 import numpy as np
 from PIL import Image
+
+import set_the_game
 
 
 # Get args.
@@ -131,10 +134,6 @@ while True:
       rect = cv2.minAreaRect(contour)
       points = np.array(cv2.cv.BoxPoints(rect), np.float32)
       rectangles.append(points)
-
-      # c1, c2 = tuple(points[0]), tuple(points[2])
-      # cv2.rectangle(frame, c1, c2, (0, 255, 0), 3)
-
       # Find NW corner.
       west_points = sorted(points, key=lambda p: p[0])[:2]
       north_points = sorted(west_points, key=lambda p: p[1])
@@ -204,6 +203,35 @@ while True:
       except ValueError:
         continue
 
+    # Look for sets.
+    cards = []
+    for name in predicted_names:
+      attributes = name.split('-')
+      cards.append({
+        'number': attributes[0],
+        'color': attributes[1],
+        'fill': attributes[2],
+        'shape': attributes[3],
+      })
+    set_found = False
+    for combo in itertools.combinations(cards, 3):
+      if set_found:
+        continue
+      if set_the_game.is_set(*combo):
+        for card in combo:
+          name = '%(number)s-%(color)s-%(fill)s-%(shape)s' % card
+          index = predicted_names.index(name)
+          try:
+            corner = ordered_corners[index]
+            for points in rectangles:
+              if corner not in points:
+                continue
+              c1, c2 = tuple(points[0]), tuple(points[2])
+              cv2.rectangle(frame, c1, c2, (0, 255, 255), 3)
+          except IndexError:
+            continue
+        set_found = True
+
     # Print FPS and print other params.
     elapsed = time.time() - now
     fps = 1. / elapsed
@@ -212,7 +240,7 @@ while True:
 
     # Display and save.
     if args['<mode>'] == 'frame':
-      cv2.drawContours(frame, card_contours, -1, (0, 255, 0), 2)
+      #cv2.drawContours(frame, card_contours, -1, (0, 255, 0), 2)
       cv2.imshow('preview', frame)
       if args['--save-cv-window']:
         cv2.imwrite('/tmp/camera-frame.png', frame)
