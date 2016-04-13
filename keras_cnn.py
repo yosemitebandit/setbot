@@ -29,9 +29,9 @@ nb_epoch = 200
 test_proportion = 0.1
 
 # Image params.
-card_width = 50
+card_width = 100
 aspect_ratio = 0.64
-card_height = int(card_width / aspect_ratio)  # 78
+card_height = int(card_width / aspect_ratio)  # 156
 image_rows, image_cols = card_height, card_width
 image_channels = 3
 
