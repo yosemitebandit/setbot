@@ -13,10 +13,11 @@ import numpy as np
 
 
 # Training params.
-batch_size = 32
+batch_size = 20
 classes = len(os.listdir('card-images'))
 epochs = 200
-test_proportion = 0.1
+samples_per_epoch = 1000
+validation_samples = 1000
 
 # Image params.
 card_width = 100
@@ -25,6 +26,13 @@ card_height = int(card_width / aspect_ratio)
 image_rows, image_cols = card_height, card_width
 image_channels = 3
 
+# Output file info.
+model_output_dir = '/var/models-for-setbot/keras-cnn-with-generator'
+base_architecture_filename = 'architecture'
+base_weights_filename = 'weights'
+loss_history_output_dir = '/tmp'
+base_loss_history_filename = 'cnn-with-generator-loss-history'
+
 # Setup labels.
 label_names = [f.split('.')[0] for f in os.listdir('card-images')]
 label_names.sort()
@@ -32,12 +40,12 @@ labels = {}
 for index, name in enumerate(label_names):
   labels[name] = index
 
-
-# Setup training data.
+# Setup training and validation splits.
 input_directory = 'rgba-data'
 all_filenames = os.listdir(input_directory)
 np.random.shuffle(all_filenames)
-
+validation_filenames = all_filenames[0:validation_samples]
+training_filenames = all_filenames[validation_samples:]
 
 def batch_generator(filenames, output_samples):
   """Generates a batch of training data, X and y.
@@ -103,14 +111,49 @@ model.compile(
   metrics=['accuracy'],
 )
 
+# Save model architecture.
+model_architecture = model.to_json()
+architecture_filename = '%s.json' % base_architecture_filename
+architecture_filepath = os.path.join(model_output_dir, architecture_filename)
+with open(architecture_filepath, 'w') as model_file:
+  model_file.write(model_architecture)
+
+# Prepare to save weights.
+weights_filename = '%s.{epoch:03d}-{val_loss:.2f}.h5' % base_weights_filename
+weights_filepath = os.path.join(model_output_dir, weights_filename)
+weight_saver = ModelCheckpoint(filepath=weights_filepath, verbose=1)
+
+# Save loss every epoch.
+class LossHistory(Callback):
+  def on_train_begin(self, logs={}):
+    self.losses = []
+
+  def on_batch_end(self, batch, logs={}):
+    self.losses.append(float(logs.get('loss')))
+
+  def on_epoch_end(self, epoch, logs={}):
+    loss_history_data = json.dumps(self.losses)
+    loss_history_filename = '%s.epoch:%03d.json' % (
+      base_loss_history_filename, epoch)
+    loss_history_filepath = os.path.join(
+      loss_history_output_dir, loss_history_filename)
+    print 'saving loss history to "%s"' % loss_history_filepath
+    with open(loss_history_filepath, 'w') as loss_history_file:
+      loss_history_file.write(loss_history_data)
+
+history_saver = LossHistory()
+
 
 # Train.
 if __name__ == '__main__':
-  data_generator = batch_generator(all_filenames, batch_size)
+  training_generator = batch_generator(training_filenames, batch_size)
+  validation_generator = batch_generator(validation_filenames, batch_size)
   model.fit_generator(
-    generator=data_generator,
-    samples_per_epoch=len(all_filenames),
+    generator=training_generator,
+    samples_per_epoch=samples_per_epoch,
     nb_epoch=epochs,
     verbose=1,
-    callbacks=[],
+    callbacks=[weight_saver, history_saver],
+    validation_data=validation_generator,
+    nb_val_samples=validation_samples,
   )
