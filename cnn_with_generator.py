@@ -49,8 +49,8 @@ def batch_generator(filenames, output_samples):
   samples_processed = 0
   samples_available = len(filenames)
   np.random.shuffle(filenames)
-  X = np.zeros((number_of_samples, image_channels, image_rows, image_cols))
-  y = np.zeros((number_of_samples,))
+  X = np.zeros((output_samples, image_channels, image_rows, image_cols))
+  y = np.zeros((output_samples,))
   while True:
     if samples_processed + output_samples > samples_available:
       print 'resetting and shuffling..'
@@ -96,14 +96,17 @@ model.add(Dense(classes))
 model.add(Activation('softmax'))
 
 adam = Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08)
-model.compile(loss='categorical_crossentropy', optimizer=adam)
+model.compile(
+  loss='categorical_crossentropy',
+  optimizer=adam,
+  metrics=['accuracy'],
+)
+
 
 class PrintBatchLogs(Callback):
   def on_batch_end(self, epoch, logs={}):
     print logs
-
-print_batch_logs_callback = PrintBatchLogs
-
+print_batch_logs_callback = PrintBatchLogs()
 
 # Train.
 data_generator = batch_generator(all_filenames, batch_size)
@@ -112,6 +115,5 @@ model.fit_generator(
   samples_per_epoch=batch_size*100,
   nb_epoch=epochs,
   verbose=1,
-  callbacks=[print_batch_logs],
-  show_accuracy=True,
+  callbacks=[print_batch_logs_callback],
 )
