@@ -89,13 +89,14 @@ for filename in os.listdir(input_directory):
   rendered_card_data[name] = np.array(image)
 print 'done.'
 
-# Setup the output image for the OpenCV window.
+# Setup the output image for the debug and gameplay windows.
 output_image_width = output_card_height * cards_per_col
 display_width_buffer = output_card_width
 output_image_height = (output_card_width * max_number_of_cols +
                        display_width_buffer +
                        output_card_width * max_number_of_cols +
                        output_card_width)
+gameplay_output_frame_width = 1000
 
 # Setup a green-to-red color gradient for drawing rectangles.
 red = Color('red')
@@ -300,16 +301,27 @@ while True:
     print 'sensitivity: %s, cards: %s, fps: %0.2f' % (
       sensitivity, number_of_cards, fps)
 
-    # Display and save.
+    # Display and save the gameplay window (resizing and rotating it).
     if mode == 'play':
       (frame_height, frame_width) = frame.shape[0:2]
-      center = (frame_width / 2, frame_height / 2)
+      print frame_width, frame_height
+      frame_aspect_ratio = float(frame_width) / frame_height
+      gameplay_output_frame_height = int(
+        gameplay_output_frame_width / frame_aspect_ratio)
+      resized_frame_image = Image.fromarray(frame).resize(
+        (gameplay_output_frame_width, gameplay_output_frame_height),
+        resample=Image.ANTIALIAS)
+      center = (gameplay_output_frame_width / 2,
+                gameplay_output_frame_height / 2)
       M = cv2.getRotationMatrix2D(center, 180, 1.)
-      rotated_frame = cv2.warpAffine(frame, M, (frame_width, frame_height))
+      rotated_frame = cv2.warpAffine(
+        np.array(resized_frame_image), M,
+        (gameplay_output_frame_width, gameplay_output_frame_height))
       cv2.imshow('preview', rotated_frame)
       if save_cv_window:
         cv2.imwrite('/tmp/play.png', rotated_frame)
 
+    # Display and save the debug window.
     elif mode == 'debug':
       cv2.imshow('preview', output_image)
       if save_cv_window:
