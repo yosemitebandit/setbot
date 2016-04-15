@@ -2,20 +2,23 @@
 
 Usage:
   camera.py <mode> [--save-card-images] [--save-cv-window] [--camera=<source>]
+    [--show-multiple-guesses]
 
 Arguments:
-  <mode>  perception or gameplay
+  <mode>  play or debug
 
 Options:
-  --save-card-images  continuously save pngs of each isolated card
-  --save-cv-window    continuously screenshot the whole OpenCV window
-  --camera=<source>   switch between webcam and external camera [default: 0]
+  --save-card-images       continuously save pngs of each isolated card
+  --save-cv-window         continuously screenshot the whole OpenCV window
+  --camera=<source>        switch cameras [default: 0]
+  --show-multiple-guesses  draw multiple set guesses
 """
 
 import itertools
 import os
 import time
 
+from colour import Color
 import cv2
 from docopt import docopt
 from keras.models import model_from_json
@@ -30,6 +33,7 @@ args = docopt(__doc__)
 mode = args['<mode>']
 save_card_images = args['--save-card-images']
 save_cv_window = args['--save-cv-window']
+show_multiple_guesses = args['--show-multiple-guesses']
 
 # Load the model.
 base_path = '/var/models-for-setbot/updated-keras-cnn-with-generator'
@@ -92,6 +96,11 @@ output_image_height = (output_card_width * max_number_of_cols +
                        display_width_buffer +
                        output_card_width * max_number_of_cols +
                        output_card_width)
+
+# Setup a green-to-red color gradient for drawing rectangles.
+red = Color('red')
+lime = Color('lime')
+gradient = list(red.range_to(lime, 100))
 
 # Start the camera.
 while True:
@@ -260,20 +269,30 @@ while True:
       most_likely_sets = sorted(
         sets_with_probabilities, key=lambda s: s[1], reverse=True)
 
-      # Draw the most likely set.
-      card_names, probability = most_likely_sets[0]
-      print '  most likey set with probability %0.2f' % probability
-      for name in card_names:
-        index = predicted_names.index(name)
-        try:
-          corner = ordered_corners[index]
-          for points in rectangles:
-            if corner not in points:
-              continue
-            c1, c2 = tuple(points[0]), tuple(points[2])
-            cv2.rectangle(frame, c1, c2, (0, 255, 255), 3)
-        except IndexError:
-          continue
+      # Draw the most likely sets with different rectangles.
+      if show_multiple_guesses:
+        sets_to_draw = most_likely_sets[0:3]
+      else:
+        sets_to_draw = [most_likely_sets[0]]
+      for set_index, possible_set in enumerate(sets_to_draw):
+        card_names, probability = possible_set
+        print '  set probability: %0.2f' % probability
+        color = gradient[int(probability * 100)].rgb
+        rgb = [int(255. * channel) for channel in color]
+        bgr = (rgb[2], rgb[1], rgb[0])
+        expansion_factor = 1 + 0.01 * set_index
+        for name in card_names:
+          index = predicted_names.index(name)
+          try:
+            corner = ordered_corners[index]
+            for points in rectangles:
+              if corner in points:
+                c1 = tuple([int(p * expansion_factor) for p in points[0]])
+                c2 = tuple([int(p * expansion_factor) for p in points[2]])
+                cv2.rectangle(frame, c1, c2, bgr, 3)
+                break
+          except IndexError:
+            continue
 
     # Print FPS and print other params.
     elapsed = time.time() - now
@@ -282,15 +301,19 @@ while True:
       sensitivity, number_of_cards, fps)
 
     # Display and save.
-    if mode == 'gameplay':
+    if mode == 'play':
       cv2.imshow('preview', frame)
       if save_cv_window:
-        cv2.imwrite('/tmp/gameplay.png', frame)
+        cv2.imwrite('/tmp/play.png', frame)
 
-    elif mode == 'perception':
+    elif mode == 'debug':
       cv2.imshow('preview', output_image)
       if save_cv_window:
-        cv2.imwrite('/tmp/perception.png', output_image)
+        cv2.imwrite('/tmp/debug.png', output_image)
+
+  # Wait.
+  if show_multiple_guesses:
+    time.sleep(2)
 
   # Capture another.
   rval, frame = vc.read()
