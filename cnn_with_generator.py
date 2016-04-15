@@ -27,11 +27,11 @@ image_rows, image_cols = card_height, card_width
 image_channels = 3
 
 # Output file info.
-model_output_dir = '/var/models-for-setbot/keras-cnn-with-generator'
+model_output_dir = '/var/models-for-setbot/updated-keras-cnn-with-generator'
 base_architecture_filename = 'architecture'
 base_weights_filename = 'weights'
 loss_history_output_dir = '/tmp'
-base_loss_history_filename = 'cnn-with-generator-loss-history'
+base_loss_history_filename = 'updated-cnn-with-generator-loss-history'
 
 # Setup labels.
 label_names = [f.split('.')[0] for f in os.listdir('card-images')]
@@ -59,7 +59,6 @@ def batch_generator(filenames, output_samples):
   np.random.shuffle(filenames)
   while True:
     if samples_processed + output_samples > samples_available:
-      print 'resetting and shuffling..'
       np.random.shuffle(filenames)
       samples_processed = 0
 
