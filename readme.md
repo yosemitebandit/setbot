@@ -36,7 +36,7 @@ and save screenshots (see `download_cards.py`)
   * adjust colors (via the site?)
   * bring back intensification?
   * consider shrinking the cards
-* consider GPU hosts -- dominodatalab or rescale
+* consider GPU hosts -- dominodatalab or rescale or just AWS
 * vgg
   * get it [here](https://gist.github.com/baraldilorenzo/07d7802847aaad0a35d3)
   * set `trainable=False` for the first few, non-Dense layers
@@ -48,6 +48,9 @@ seems fixed if each dealt card has a slight ccw rotation..
 struggles with 1 striped diamond vs three
 * on batching -- could try your generator examples for longer..
 could also just run `model.fit` with self-made batches
+* something's not right -- `batch_size = 100` and `samples_per_epoch = 1000`
+does not converge in `cnn_with_generator` but if I use 10x more `samples_per_epoch`
+I do get convergence..should I go back to vanilla tensorflow?
 
 
 #### rules of set
