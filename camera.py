@@ -4,7 +4,7 @@ Usage:
   camera.py <mode> [--save-card-images] [--save-cv-window] [--camera=<source>]
 
 Arguments:
-  <mode>  show the image 'frame' (for calibration) or try to 'predict'
+  <mode>  perception or gameplay
 
 Options:
   --save-card-images  continuously save pngs of each isolated card
@@ -27,14 +27,22 @@ import set_the_game
 
 # Get args.
 args = docopt(__doc__)
+mode = args['<mode>']
+save_card_images = args['--save-card-images']
+save_cv_window = args['--save-cv-window']
 
 # Load the model.
-architecture_path = '/var/models-for-setbot/keras-cnn/architecture.json'
-weights_path = '/var/models-for-setbot/keras-cnn/weights.hdf5'
+base_path = '/var/models-for-setbot/updated-keras-cnn-with-generator'
+architecture_path = os.path.join(base_path, 'architecture.json')
+weights_path = os.path.join(base_path, 'weights.020-0.05.h5')
 print 'loading model..'
 with open(architecture_path) as architecture_file:
   model = model_from_json(architecture_file.read())
 model.load_weights(weights_path)
+model.compile(
+  loss='categorical_crossentropy',
+  optimizer='adam',
+)
 print 'done.'
 
 # Setup labels.
@@ -53,7 +61,7 @@ cards_per_col = 3
 max_number_of_cols = max_number_of_cards / cards_per_col
 channels = 3
 aspect_ratio = 0.64
-width = 50
+width = 100
 height = int(width / aspect_ratio)
 image_rows, image_cols = height, width
 transform_matrix = np.array(
@@ -98,20 +106,19 @@ while True:
     lower_white = np.array([0, 0, 255-sensitivity])
     upper_white = np.array([255, sensitivity, 255])
 
+    # Set white threshold and find possible cards.
     hsv_img = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     thresh = cv2.inRange(hsv_img, lower_white, upper_white)
-
     contours, _ = cv2.findContours(
       thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
-    # Start guessing how many cards are visible.
+    # Start guessing about the number of cards present.
     first_six_contours = sorted(
       contours, key=cv2.contourArea, reverse=True)[0:6]
     areas = map(cv2.contourArea, first_six_contours)
     # We use median here rather than average because that seems to be more
     # resilient to encroaching hands.
     median_area = np.median(areas)
-
     possible_contours = sorted(
       contours, key=cv2.contourArea, reverse=True)[0:max_number_of_cards]
     card_contours = []
@@ -124,7 +131,6 @@ while True:
     cards_per_row = number_of_cards / cards_per_col
     if number_of_cards == 0 or cards_per_row == 0:
       print 'not enough cards in view..'
-      time.sleep(0.2)
       continue
 
     # Sort contours by distance from top left so we can display the cards in
@@ -166,7 +172,7 @@ while True:
         b, g, r = np.split(bgr_card, 3, axis=2)
         rgb_card = np.concatenate((r, g, b), axis=2)
         card_image = Image.fromarray(rgb_card)
-        if args['--save-card-images']:
+        if save_card_images:
           filepath = '/tmp/%02d.png' % index
           card_image.save(filepath)
         data = rgb_card.reshape(3, image_rows, image_cols)
@@ -213,24 +219,23 @@ while True:
         'fill': attributes[2],
         'shape': attributes[3],
       })
-    set_found = False
     for combo in itertools.combinations(cards, 3):
-      if set_found:
+      if not set_the_game.is_set(*combo):
         continue
-      if set_the_game.is_set(*combo):
-        for card in combo:
-          name = '%(number)s-%(color)s-%(fill)s-%(shape)s' % card
-          index = predicted_names.index(name)
-          try:
-            corner = ordered_corners[index]
-            for points in rectangles:
-              if corner not in points:
-                continue
-              c1, c2 = tuple(points[0]), tuple(points[2])
-              cv2.rectangle(frame, c1, c2, (0, 255, 255), 3)
-          except IndexError:
-            continue
-        set_found = True
+      print 'set!'
+      for card in combo:
+        name = '%(number)s-%(color)s-%(fill)s-%(shape)s' % card
+        index = predicted_names.index(name)
+        try:
+          corner = ordered_corners[index]
+          for points in rectangles:
+            if corner not in points:
+              continue
+            c1, c2 = tuple(points[0]), tuple(points[2])
+            cv2.rectangle(frame, c1, c2, (0, 255, 255), 3)
+        except IndexError:
+          continue
+      break
 
     # Print FPS and print other params.
     elapsed = time.time() - now
@@ -239,15 +244,15 @@ while True:
       sensitivity, number_of_cards, fps)
 
     # Display and save.
-    if args['<mode>'] == 'frame':
-      #cv2.drawContours(frame, card_contours, -1, (0, 255, 0), 2)
+    if mode == 'gameplay':
       cv2.imshow('preview', frame)
-      if args['--save-cv-window']:
-        cv2.imwrite('/tmp/camera-frame.png', frame)
-    elif args['<mode>'] == 'predict':
+      if save_cv_window:
+        cv2.imwrite('/tmp/gameplay.png', frame)
+
+    elif mode == 'perception':
       cv2.imshow('preview', output_image)
-      if args['--save-cv-window']:
-        cv2.imwrite('/tmp/perception-and-prediction.png', output_image)
+      if save_cv_window:
+        cv2.imwrite('/tmp/perception.png', output_image)
 
   # Capture another.
   rval, frame = vc.read()
