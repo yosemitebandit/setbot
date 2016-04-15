@@ -37,7 +37,9 @@ then the `set_the_game.py` module helps identify a set
 * an evaluation routine loads pre-trained models and examines new pictures of cards
 (`evaluator.ipynb`)
 * ..this didn't work all that well in practice though,
-I think the synthetic data I used for training wasn't representative
+I think the synthetic data I used for training wasn't representative --
+I may have also been evaluating my model incorrectly, I had issues with that
+later in the 81 class work
 
 
 #### next steps
