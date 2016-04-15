@@ -13,10 +13,10 @@ import numpy as np
 
 
 # Training params.
-batch_size = 20
+batch_size = 100
 classes = len(os.listdir('card-images'))
 epochs = 200
-samples_per_epoch = 1000
+samples_per_epoch = 10000
 validation_samples = 1000
 
 # Image params.
