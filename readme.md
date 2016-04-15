@@ -13,13 +13,22 @@ and then using several TensorFlow models to classify these synthetic examples.
 and save screenshots (see `download_cards.py`)
 * an ipython notebook generates more images and data (`generate_input_data.ipynb`):
   * images are cropped,
-  * intensified,
+  * resized,
   * rotated,
-  * resized (shrunk),
-  * blurred,
-  * and greyscaled
-  * the rgb and greyscaled images are converted to separate npy files
-* create various models to classify the properties of each card
+  * obfuscated,
+  * their white balance is shifted,
+  * and blurred
+  * the rgb images are converted to separate npy data files
+* a keras CNN trains on ~200k cards --
+typically for about 8hrs on an 8 core digital ocean box to get >90% accuracy
+(see `cnn_with_generator.py`)
+* `camera.py` finds cards via thresholding
+and sends them through the trained model to understand their characteristics,
+then the `set_the_game.py` module helps identify a set
+
+
+#### old notebooks
+* I created various models to classify the properties of each card
   * one neural network guesses how many shapes are present in an input image
   (`detect_number.ipynb`) -- 94% accurate
   * another model guesses the color of the shapes (`detect_color.ipynb`) -- 95% accurate
@@ -27,6 +36,8 @@ and save screenshots (see `download_cards.py`)
   * and the last predicts the card's texture (`detect_texture.ipynb`) -- 99% accurate
 * an evaluation routine loads pre-trained models and examines new pictures of cards
 (`evaluator.ipynb`)
+* ..this didn't work all that well in practice though,
+I think the synthetic data I used for training wasn't representative
 
 
 #### next steps
@@ -44,10 +55,6 @@ and save screenshots (see `download_cards.py`)
   * load the weights and train some more..
 * train on rotated / mis-scaled cards or fix the input rotation issue --
 seems fixed if each dealt card has a slight ccw rotation..
-* consider training on larger images (having issue with color / shading sometimes) --
-struggles with 1 striped diamond vs three
-* on batching -- could try your generator examples for longer..
-could also just run `model.fit` with self-made batches
 * something's not right -- `batch_size = 100` and `samples_per_epoch = 1000`
 does not converge in `cnn_with_generator` but if I use 10x more `samples_per_epoch`
 I do get convergence..should I go back to vanilla tensorflow?
@@ -73,3 +80,5 @@ at this point, the player with the most sets wins
 * useful [bezier editor](http://www.victoriakirst.com/beziertool)
 * [isolated bean image for tracing](http://i.imgur.com/U9k6OMR.png)
 * used [this answer](http://stackoverflow.com/a/12043136/232638) to get opnecv in a virtualenv
+* I thought I would need `setbot-server` to do evaluation in the cloud,
+but that's not the case -- keeping it around as it's a good flask demo
