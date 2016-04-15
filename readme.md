@@ -55,9 +55,9 @@ I think the synthetic data I used for training wasn't representative
   * load the weights and train some more..
 * train on rotated / mis-scaled cards or fix the input rotation issue --
 seems fixed if each dealt card has a slight ccw rotation..
-* something's not right -- `batch_size = 100` and `samples_per_epoch = 1000`
+* something's not right with keras -- `batch_size = 100` and `samples_per_epoch = 1000`
 does not converge in `cnn_with_generator` but if I use 10x more `samples_per_epoch`
-I do get convergence..should I go back to vanilla tensorflow?
+I do get convergence.. should I go back to vanilla tensorflow?
 
 
 #### rules of set
