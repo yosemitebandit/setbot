@@ -296,16 +296,14 @@ while True:
           except IndexError:
             continue
 
-    # Print FPS and print other params.
+    # Print FPS.
     elapsed = time.time() - now
     fps = 1. / elapsed
-    print 'sensitivity: %s, cards: %s, fps: %0.2f' % (
-      sensitivity, number_of_cards, fps)
+    print '  fps: %0.2f' % fps
 
     # Display and save the gameplay window (resizing and rotating it).
     if mode == 'play':
       (frame_height, frame_width) = frame.shape[0:2]
-      print frame_width, frame_height
       frame_aspect_ratio = float(frame_width) / frame_height
       gameplay_output_frame_height = int(
         gameplay_output_frame_width / frame_aspect_ratio)
