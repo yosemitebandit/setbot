@@ -278,8 +278,8 @@ while True:
       for set_index, possible_set in enumerate(sets_to_draw):
         card_names, probability = possible_set
         print '  set probability: %0.2f' % probability
-        color = gradient[int(probability * 100)].rgb
-        rgb = [int(255. * channel) for channel in color]
+        color = gradient[max(0, int(probability * 100) - 1)]
+        rgb = [int(255. * channel) for channel in color.rgb]
         bgr = (rgb[2], rgb[1], rgb[0])
         expansion_factor = 1 + 0.01 * set_index
         for name in card_names:
