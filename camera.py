@@ -2,7 +2,7 @@
 
 Usage:
   camera.py <mode> [--save-card-images] [--save-cv-window] [--camera=<source>]
-    [--show-multiple-guesses]
+    [--show-multiple-guesses] [--sensitivity=<value>]
 
 Arguments:
   <mode>  play or debug
@@ -12,6 +12,7 @@ Options:
   --save-cv-window         continuously screenshot the whole OpenCV window
   --camera=<source>        switch cameras [default: 0]
   --show-multiple-guesses  draw multiple set guesses
+  --sensitivity=<value>    sets the white threshold sensitivity [default: 150]
 """
 
 import itertools
@@ -34,6 +35,7 @@ mode = args['<mode>']
 save_card_images = args['--save-card-images']
 save_cv_window = args['--save-cv-window']
 show_multiple_guesses = args['--show-multiple-guesses']
+sensitivity = max(0, min(255, int(args['--sensitivity'])))
 
 # Load the model.
 base_path = '/var/models-for-setbot/updated-keras-cnn-with-generator'
@@ -55,7 +57,6 @@ filename_labels.sort()
 
 # Setup display.
 cv2.namedWindow('preview')
-cv2.createTrackbar('sensitivity', 'preview', 150, 255, lambda x: x)
 vc = cv2.VideoCapture(int(args['--camera']))
 
 # Card params.
@@ -111,8 +112,7 @@ while True:
     # Get time for fps.
     now = time.time()
 
-    # Set white threshold from slider.
-    sensitivity = cv2.getTrackbarPos('sensitivity', 'preview')
+    # Set white threshold.
     lower_white = np.array([0, 0, 255-sensitivity])
     upper_white = np.array([255, sensitivity, 255])
 
