@@ -56,7 +56,7 @@ filename_labels = [f.split('.')[0] for f in os.listdir('card-images')]
 filename_labels.sort()
 
 # Setup display.
-cv2.namedWindow('preview')
+cv2.namedWindow('setbot')
 vc = cv2.VideoCapture(int(args['--camera']))
 
 # Card params.
@@ -317,13 +317,13 @@ while True:
       rotated_frame = cv2.warpAffine(
         np.array(resized_frame_image), M,
         (gameplay_output_frame_width, gameplay_output_frame_height))
-      cv2.imshow('preview', rotated_frame)
+      cv2.imshow('setbot', rotated_frame)
       if save_cv_window:
         cv2.imwrite('/tmp/play.png', rotated_frame)
 
     # Display and save the debug window.
     elif mode == 'debug':
-      cv2.imshow('preview', output_image)
+      cv2.imshow('setbot', output_image)
       if save_cv_window:
         cv2.imwrite('/tmp/debug.png', output_image)
 
