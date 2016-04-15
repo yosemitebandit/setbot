@@ -18,7 +18,7 @@ import numpy as np
 # Card params.
 channels = 3
 aspect_ratio = 0.64
-width = 50
+width = 100
 height = int(width / aspect_ratio)
 image_rows, image_cols = height, width
 
@@ -26,12 +26,16 @@ image_rows, image_cols = height, width
 args = docopt(__doc__)
 
 # Load the model.
-architecture_path = '/var/models-for-setbot/keras-cnn/architecture.json'
-weights_path = '/var/models-for-setbot/keras-cnn/weights.hdf5'
+architecture_path = '/var/models-for-setbot/updated-keras-cnn-with-generator/architecture.json'
+weights_path = '/var/models-for-setbot/updated-keras-cnn-with-generator/weights.020-0.05.h5'
 print 'loading model..'
 with open(architecture_path) as architecture_file:
   model = model_from_json(architecture_file.read())
 model.load_weights(weights_path)
+model.compile(
+  loss='categorical_crossentropy',
+  optimizer='adam',
+)
 print 'done.'
 
 # Setup labels.
