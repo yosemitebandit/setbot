@@ -145,11 +145,11 @@ while True:
 
     # Sort contours by distance from top left so we can display the cards in
     # order.
-    rectangles, nw_corners = [], []
+    rectangles_with_contours, nw_corners = [], []
     for contour in card_contours:
       rect = cv2.minAreaRect(contour)
       points = np.array(cv2.cv.BoxPoints(rect), np.float32)
-      rectangles.append(points)
+      rectangles_with_contours.append((points, contour))
       # Find NW corner.
       west_points = sorted(points, key=lambda p: p[0])[:2]
       north_points = sorted(west_points, key=lambda p: p[1])
@@ -174,7 +174,7 @@ while True:
     classifier_input = np.zeros(
       (number_of_cards, channels, image_rows, image_cols))
     for index, corner in enumerate(ordered_corners):
-      for points in rectangles:
+      for points, _ in rectangles_with_contours:
         if corner not in points:
           continue
         transform = cv2.getPerspectiveTransform(points, transform_matrix)
@@ -286,11 +286,12 @@ while True:
           index = predicted_names.index(name)
           try:
             corner = ordered_corners[index]
-            for points in rectangles:
+            for points, contour in rectangles_with_contours:
               if corner in points:
-                c1 = tuple([int(p * expansion_factor) for p in points[0]])
-                c2 = tuple([int(p * expansion_factor) for p in points[2]])
-                cv2.rectangle(frame, c1, c2, bgr, 3)
+                # c1 = tuple([int(p * expansion_factor) for p in points[0]])
+                # c2 = tuple([int(p * expansion_factor) for p in points[2]])
+                # cv2.rectangle(frame, c1, c2, bgr, 3)
+                cv2.drawContours(frame, [contour], -1, bgr, 3)
                 break
           except IndexError:
             continue
