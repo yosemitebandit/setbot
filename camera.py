@@ -302,9 +302,13 @@ while True:
 
     # Display and save.
     if mode == 'play':
-      cv2.imshow('preview', frame)
+      (frame_height, frame_width) = frame.shape[0:2]
+      center = (frame_width / 2, frame_height / 2)
+      M = cv2.getRotationMatrix2D(center, 180, 1.)
+      rotated_frame = cv2.warpAffine(frame, M, (frame_width, frame_height))
+      cv2.imshow('preview', rotated_frame)
       if save_cv_window:
-        cv2.imwrite('/tmp/play.png', frame)
+        cv2.imwrite('/tmp/play.png', rotated_frame)
 
     elif mode == 'debug':
       cv2.imshow('preview', output_image)
