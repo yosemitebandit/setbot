@@ -187,10 +187,29 @@ while True:
           :channels
         ] = output_card_data
 
+    # Predict cards.
     classifier_input = classifier_input.astype('float32')
     classifier_input /= 255
-    prediction = model.predict_classes(classifier_input, verbose=False)
-    predicted_names = [filename_labels[i] for i in prediction]
+    card_predictions = []
+    card_probabilities = model.predict_proba(classifier_input, verbose=0)
+    for card_index, class_probabilities in enumerate(card_probabilities):
+      filtered_class_probabilities = []
+      for class_index, class_probability in enumerate(class_probabilities):
+        if class_probability > 0.01:
+          filtered_class_probabilities.append(
+            (filename_labels[class_index], class_probability))
+      sorted_class_probabilities = sorted(
+        filtered_class_probabilities, key=lambda p: p[1], reverse=True)
+      card_predictions.append(sorted_class_probabilities)
+    predicted_names = [card[0][0] for card in card_predictions]
+
+    # Create another container for this data.
+    # todo: handle card prediction dupes
+    card_name_likelihoods = {}
+    for card in card_predictions:
+      name = card[0][0]
+      probability = card[0][1]
+      card_name_likelihoods[name] = probability
 
     # Draw the estimate.
     for index, name in enumerate(predicted_names):
@@ -209,7 +228,7 @@ while True:
       except ValueError:
         continue
 
-    # Look for sets.
+    # Break cards into their attributes.
     cards = []
     for name in predicted_names:
       attributes = name.split('-')
@@ -219,12 +238,32 @@ while True:
         'fill': attributes[2],
         'shape': attributes[3],
       })
+
+    # Look for sets.
+    sets = []
     for combo in itertools.combinations(cards, 3):
-      if not set_the_game.is_set(*combo):
-        continue
-      print 'set!'
-      for card in combo:
-        name = '%(number)s-%(color)s-%(fill)s-%(shape)s' % card
+      if set_the_game.is_set(*combo):
+        sets.append(combo)
+
+    if sets:
+      # Determine likelihood of each set based on card probabilities.
+      sets_with_probabilities = []
+      for combo in sets:
+        cumulative_probability = 1.
+        names = []
+        for card in combo:
+          name = '%(number)s-%(color)s-%(fill)s-%(shape)s' % card
+          cumulative_probability *= card_name_likelihoods[name]
+          names.append(name)
+        sets_with_probabilities.append((names, cumulative_probability))
+
+      most_likely_sets = sorted(
+        sets_with_probabilities, key=lambda s: s[1], reverse=True)
+
+      # Draw the most likely set.
+      card_names, probability = most_likely_sets[0]
+      print '  most likey set with probability %0.2f' % probability
+      for name in card_names:
         index = predicted_names.index(name)
         try:
           corner = ordered_corners[index]
@@ -235,7 +274,6 @@ while True:
             cv2.rectangle(frame, c1, c2, (0, 255, 255), 3)
         except IndexError:
           continue
-      break
 
     # Print FPS and print other params.
     elapsed = time.time() - now
