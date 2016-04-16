@@ -2,7 +2,7 @@
 
 Usage:
   camera.py <mode> [--save-card-images] [--save-cv-window] [--camera=<source>]
-    [--show-multiple-guesses] [--sensitivity=<value>]
+    [--show-multiple-guesses] [--sensitivity=<value>] [--rotate-hand]
 
 Arguments:
   <mode>  play or debug
@@ -13,6 +13,7 @@ Options:
   --camera=<source>        switch cameras [default: 0]
   --show-multiple-guesses  draw multiple set guesses
   --sensitivity=<value>    sets the white threshold sensitivity [default: 150]
+  --rotate-hand            rotates the gameplay hand
 """
 
 import itertools
@@ -36,6 +37,7 @@ save_card_images = args['--save-card-images']
 save_cv_window = args['--save-cv-window']
 show_multiple_guesses = args['--show-multiple-guesses']
 sensitivity = max(0, min(255, int(args['--sensitivity'])))
+rotate_hand = args['--rotate-hand']
 
 # Load the model.
 base_path = '/var/models-for-setbot/updated-keras-cnn-with-generator'
@@ -307,16 +309,22 @@ while True:
       frame_aspect_ratio = float(frame_width) / frame_height
       gameplay_output_frame_height = int(
         gameplay_output_frame_width / frame_aspect_ratio)
-      resized_frame_image = Image.fromarray(frame).resize(
+      frame = Image.fromarray(frame).resize(
         (gameplay_output_frame_width, gameplay_output_frame_height),
         resample=Image.ANTIALIAS)
-      center = (gameplay_output_frame_width / 2,
-                gameplay_output_frame_height / 2)
-      M = cv2.getRotationMatrix2D(center, 180, 1.)
-      rotated_frame = cv2.warpAffine(
-        np.array(resized_frame_image), M,
-        (gameplay_output_frame_width, gameplay_output_frame_height))
-      cv2.imshow('setbot', rotated_frame)
+      frame = np.array(frame)
+      # This is a bit confusing because in the typical case we /do/ want to
+      # rotate the hand and show it as a human player facing the camera would
+      # see it.  So if the --rotate-hand arg is passed, we'll rotate 180 from
+      # the default by *not* performing the typical rotation.
+      if not rotate_hand:
+        center = (gameplay_output_frame_width / 2,
+                  gameplay_output_frame_height / 2)
+        rotation_matrix = cv2.getRotationMatrix2D(center, 180, 1.)
+        frame = cv2.warpAffine(
+          frame, rotation_matrix,
+          (gameplay_output_frame_width, gameplay_output_frame_height))
+      cv2.imshow('setbot', frame)
       if save_cv_window:
         cv2.imwrite('/tmp/play.png', rotated_frame)
 
