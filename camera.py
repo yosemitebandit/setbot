@@ -1,15 +1,12 @@
 """Card isolation and prediction.
 
 Usage:
-  camera.py <mode> [--save-card-images] [--save-cv-window] [--camera=<source>]
+  camera.py [--save-card-images] [--save-cv-windows] [--camera=<source>]
     [--show-multiple-guesses] [--sensitivity=<value>] [--rotate-hand]
-
-Arguments:
-  <mode>  play or debug
 
 Options:
   --save-card-images       continuously save pngs of each isolated card
-  --save-cv-window         continuously screenshot the whole OpenCV window
+  --save-cv-windows        continuously screenshot the OpenCV windows
   --camera=<source>        switch cameras [default: 0]
   --show-multiple-guesses  draw multiple set guesses
   --sensitivity=<value>    sets the white threshold sensitivity [default: 150]
@@ -32,9 +29,8 @@ import set_the_game
 
 # Get args.
 args = docopt(__doc__)
-mode = args['<mode>']
 save_card_images = args['--save-card-images']
-save_cv_window = args['--save-cv-window']
+save_cv_windows = args['--save-cv-windows']
 show_multiple_guesses = args['--show-multiple-guesses']
 sensitivity = max(0, min(255, int(args['--sensitivity'])))
 rotate_hand = args['--rotate-hand']
@@ -43,6 +39,9 @@ rotate_hand = args['--rotate-hand']
 base_path = '/var/models-for-setbot/updated-keras-cnn-with-generator'
 architecture_path = os.path.join(base_path, 'architecture.json')
 weights_path = os.path.join(base_path, 'weights.020-0.05.h5')
+# base_path = '/var/models-for-setbot/keras-cnn/updated-with-more-rectangles'
+# architecture_path = os.path.join(base_path, 'architecture.json')
+# weights_path = os.path.join(base_path, 'weights.026-0.74.h5')
 print 'loading model..'
 with open(architecture_path) as architecture_file:
   model = model_from_json(architecture_file.read())
@@ -57,8 +56,9 @@ print 'done.'
 filename_labels = [f.split('.')[0] for f in os.listdir('card-images')]
 filename_labels.sort()
 
-# Setup display.
+# Setup displays.
 cv2.namedWindow('setbot')
+cv2.namedWindow('debug')
 vc = cv2.VideoCapture(int(args['--camera']))
 
 # Card params.
@@ -240,6 +240,9 @@ while True:
       except ValueError:
         continue
 
+    # Show the debug window.
+    cv2.imshow('debug', output_image)
+
     # Break cards into their attributes.
     cards = []
     for name in predicted_names:
@@ -304,35 +307,33 @@ while True:
     print '  fps: %0.2f' % fps
 
     # Display and save the gameplay window (resizing and rotating it).
-    if mode == 'play':
-      (frame_height, frame_width) = frame.shape[0:2]
-      frame_aspect_ratio = float(frame_width) / frame_height
-      gameplay_output_frame_height = int(
-        gameplay_output_frame_width / frame_aspect_ratio)
-      frame = Image.fromarray(frame).resize(
-        (gameplay_output_frame_width, gameplay_output_frame_height),
-        resample=Image.ANTIALIAS)
-      frame = np.array(frame)
-      # This is a bit confusing because in the typical case we /do/ want to
-      # rotate the hand and show it as a human player facing the camera would
-      # see it.  So if the --rotate-hand arg is passed, we'll rotate 180 from
-      # the default by *not* performing the typical rotation.
-      if not rotate_hand:
-        center = (gameplay_output_frame_width / 2,
-                  gameplay_output_frame_height / 2)
-        rotation_matrix = cv2.getRotationMatrix2D(center, 180, 1.)
-        frame = cv2.warpAffine(
-          frame, rotation_matrix,
-          (gameplay_output_frame_width, gameplay_output_frame_height))
-      cv2.imshow('setbot', frame)
-      if save_cv_window:
-        cv2.imwrite('/tmp/play.png', rotated_frame)
+    (frame_height, frame_width) = frame.shape[0:2]
+    frame_aspect_ratio = float(frame_width) / frame_height
+    gameplay_output_frame_height = int(
+      gameplay_output_frame_width / frame_aspect_ratio)
+    frame = Image.fromarray(frame).resize(
+      (gameplay_output_frame_width, gameplay_output_frame_height),
+      resample=Image.ANTIALIAS)
+    frame = np.array(frame)
+    # This is a bit confusing because in the typical case we /do/ want to
+    # rotate the hand and show it as a human player facing the camera would
+    # see it.  So if the --rotate-hand arg is passed, we'll rotate 180 from
+    # the default by *not* performing the typical rotation.
+    if not rotate_hand:
+      center = (gameplay_output_frame_width / 2,
+                gameplay_output_frame_height / 2)
+      rotation_matrix = cv2.getRotationMatrix2D(center, 180, 1.)
+      frame = cv2.warpAffine(
+        frame, rotation_matrix,
+        (gameplay_output_frame_width, gameplay_output_frame_height))
 
-    # Display and save the debug window.
-    elif mode == 'debug':
-      cv2.imshow('setbot', output_image)
-      if save_cv_window:
-        cv2.imwrite('/tmp/debug.png', output_image)
+    # Show the gameplay frame.
+    cv2.imshow('setbot', frame)
+
+    # Save windows.
+    if save_cv_windows:
+      cv2.imwrite('/tmp/debug.png', output_image)
+      cv2.imwrite('/tmp/play.png', rotated_frame)
 
   # Wait.
   if show_multiple_guesses:
