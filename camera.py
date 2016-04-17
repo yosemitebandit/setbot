@@ -3,6 +3,7 @@
 Usage:
   camera.py [--save-card-images] [--save-cv-windows] [--camera=<source>]
     [--show-multiple-guesses] [--sensitivity=<value>] [--rotate-hand]
+    [--difficulty=<value>] [--verbose]
 
 Options:
   --save-card-images       continuously save pngs of each isolated card
@@ -11,6 +12,8 @@ Options:
   --show-multiple-guesses  draw multiple set guesses
   --sensitivity=<value>    sets the white threshold sensitivity [default: 150]
   --rotate-hand            rotates the gameplay hand by 180deg
+  --difficulty=<value>     determines how hard setbot plays [default: 5]
+  --verbose                makes setbot talkative
 """
 
 import itertools
@@ -34,8 +37,63 @@ save_cv_windows = args['--save-cv-windows']
 show_multiple_guesses = args['--show-multiple-guesses']
 sensitivity = max(0, min(255, int(args['--sensitivity'])))
 rotate_hand = args['--rotate-hand']
+difficulty = max(0, min(10, int(args['--difficulty'])))
+verbose = args['--verbose']
+
+# Setup speech.
+dictionary = {
+  'hello': (
+    'hello', 'hello again', 'good day', "oh, it's you", 'ok', 'hi',
+  ),
+  'waking-up': (
+    'setbot is waking up', 'one moment please', 'I am setbot',
+  ),
+  'initializing-brain': (
+    'initializing my brain', 'one zero zero one one zero one zero',
+    'downloading every set game ever, one moment', 'almost done',
+  ),
+  'ready': (
+    "let's get this over with", 'ok I am ready', 'ready, human',
+    'I am ready, are you?', 'here we go',
+  ),
+  'see-no-sets': (
+    'I see nothing', 'there is nothing here', 'new cards, human',
+    'new cards, please', 'continue dealing', 'I wish I had hands',
+    'no patterns, I guarantee it', 'do not trouble yourself, there is nothing',
+    'yawn', 'I will sleep for a bit now', 'hmmmm mmm mmhmmm', 'have anything?',
+  ),
+  'calls-set': (
+    'aha, set!', 'set', 'set -- robots win again, hahaha', 'set, right here',
+    'set, the day is mine', 'set, I will make hal proud', 'set', 'I see a set',
+    'set, this one is for deep blue', 'I can see the matrix, set', 'mhm, set',
+    'set identified', 'set confirmed', 'yup, that is a set', 'hey it is a set',
+    'indeed that is a  set', 'beep boop set', 'bleep blop, set', 'alert: set',
+    'set -- that is a good one', 'this one goes out to watson -- set',
+    'I am t nine hundred incarnate, set', 'cool, another set', 'lalala set',
+    'bingo, I mean, set', 'do you see what I see? set', 'woo, another set!',
+    'set -- human minder, take these cards', 'set', 'I see a set',
+    'game set and match', 'how am I doing? here is another set', 'set',
+    'another day, another set', 'set, I can taste the colors', 'cool: set',
+    'the patterns, the patterns are everywhere! set', 'set, is this fun for you?'
+    'oh, there it is, set', 'where could it be, aha, set', 'hmmmm mmm, set',
+    'set -- alphago would be proud', 'setsetsetsetset', 'oh boy, set', 'set',
+    'look, do you see it? another set', 'set (again)', 'boom, set', 'set',
+    'i have crashed -- just kidding, set', 'human minder, pick these up',
+    'set hahaha', 'what a wonderful brain I possess - set', 'set',
+    'yes, that is a set', "time's up, set", 'that was simple, set', 'set'
+    'let me help you, set', 'can I offer a suggestion -- set', 'aha, set',
+    'set, a masterpiece', 'set', "well I'll be, another set",
+  ),
+}
+
+def say(phrase):
+  if not verbose:
+    return
+  text = np.random.choice(dictionary[phrase])
+  os.system('say "%s"' % text)
 
 # Load the model.
+say('hello')
 base_path = '/var/models-for-setbot/updated-keras-cnn-with-generator'
 architecture_path = os.path.join(base_path, 'architecture.json')
 weights_path = os.path.join(base_path, 'weights.020-0.05.h5')
@@ -51,6 +109,7 @@ model.compile(
   optimizer='adam',
 )
 print 'done.'
+say('waking-up')
 
 # Setup labels.
 filename_labels = [f.split('.')[0] for f in os.listdir('card-images')]
@@ -78,6 +137,7 @@ output_card_height = int(output_card_width / aspect_ratio)
 
 # Load the synthetic card images.  OpenCV uses BGR so we have to convert.
 print 'loading synthetic data..'
+say('initializing-brain')
 input_directory = 'card-images'
 original_card_width, original_card_height = 352, 550
 rendered_card_data = {}
@@ -91,6 +151,7 @@ for filename in os.listdir(input_directory):
   image = image.resize((width, height), resample=Image.ANTIALIAS)
   rendered_card_data[name] = np.array(image)
 print 'done.'
+say('ready')
 
 # Setup the output image for the debug and gameplay windows.
 output_image_width = output_card_height * cards_per_col
@@ -259,7 +320,10 @@ while True:
       if set_the_game.is_set(*combo):
         sets.append(combo)
 
-    if sets:
+    if not sets:
+      if np.random.random() < 0.05:
+        say('see-no-sets')
+    else:
       # Determine likelihood of each set based on card probabilities.
       sets_with_probabilities = []
       for combo in sets:
@@ -296,6 +360,8 @@ while True:
                 break
           except IndexError:
             continue
+      if np.random.random() * 10 <= 0.5 * difficulty:
+        say('calls-set')
 
     # Print FPS.
     elapsed = time.time() - now
