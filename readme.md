@@ -1,7 +1,10 @@
 playing set, the pattern-finding card game
 
-I'm generating images of each card via SVG
-and then using several TensorFlow models to classify these synthetic examples.
+A webcam + OpenCV isolates cards and feeds them to a CNN for identification.
+The rules of set are pretty straightforward, so once cards are identified it
+doesn't take long to find sets of three.
+
+![gameplay](play.png)
 
 
 #### pipeline
@@ -21,7 +24,7 @@ and save screenshots (see `download_cards.py`)
   * the rgb images are converted to separate npy data files
 * a keras CNN trains on ~200k cards --
 typically for about 8hrs on an 8 core digital ocean box to get >90% accuracy
-(see `cnn_with_generator.py`)
+(see `cnn_with_generator.py`) -- I haven't yet tried a GPU
 * `camera.py` finds cards via thresholding
 and sends them through the trained model to understand their characteristics,
 then the `set_the_game.py` module helps identify a set
