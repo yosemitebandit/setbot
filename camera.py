@@ -10,7 +10,7 @@ Options:
   --camera=<source>        switch cameras [default: 0]
   --show-multiple-guesses  draw multiple set guesses
   --sensitivity=<value>    sets the white threshold sensitivity [default: 150]
-  --rotate-hand            rotates the gameplay hand
+  --rotate-hand            rotates the gameplay hand by 180deg
 """
 
 import itertools
@@ -216,7 +216,6 @@ while True:
     predicted_names = [card[0][0] for card in card_predictions]
 
     # Create another container for this data.
-    # todo: handle card prediction dupes
     card_name_likelihoods = {}
     for card in card_predictions:
       name = card[0][0]
@@ -293,9 +292,6 @@ while True:
             corner = ordered_corners[index]
             for points, contour in rectangles_with_contours:
               if corner in points:
-                # c1 = tuple([int(p * expansion_factor) for p in points[0]])
-                # c2 = tuple([int(p * expansion_factor) for p in points[2]])
-                # cv2.rectangle(frame, c1, c2, bgr, 3)
                 cv2.drawContours(frame, [contour], -1, bgr, 3)
                 break
           except IndexError:
@@ -333,7 +329,7 @@ while True:
     # Save windows.
     if save_cv_windows:
       cv2.imwrite('/tmp/debug.png', output_image)
-      cv2.imwrite('/tmp/play.png', rotated_frame)
+      cv2.imwrite('/tmp/play.png', frame)
 
   # Wait.
   if show_multiple_guesses:

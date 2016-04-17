@@ -45,6 +45,7 @@ later in the 81 class work
 #### next steps
 * need a larger board -- see sketch
 * print stuff on the right sidebar in the camera output
+* handle card prediction dupes
 * improve data generation pipeline:
   * adjust colors (via the site?)
   * bring back intensification?
