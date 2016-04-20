@@ -17,6 +17,7 @@ Options:
 """
 
 import itertools
+import multiprocessing
 import os
 import time
 
@@ -86,11 +87,16 @@ dictionary = {
   ),
 }
 
-def say(phrase):
-  if not verbose:
-    return
+def speak(phrase):
   text = np.random.choice(dictionary[phrase])
   os.system('say "%s"' % text)
+
+def say(phrase):
+  """Non-blocking wrapper around the speak method."""
+  if not verbose:
+    return
+  p = multiprocessing.Process(target=speak, args=(phrase,))
+  p.start()
 
 # Load the model.
 say('hello')
