@@ -84,6 +84,7 @@ dictionary = {
     'yes, that is a set', "time's up, set", 'that was simple, set', 'set'
     'let me help you, set', 'can I offer a suggestion -- set', 'aha, set',
     'set, a masterpiece', 'set', "well I'll be, another set",
+    'sweet, another set', 'aha, set', 'bingo, set', 'set', 'woo, set',
   ),
 }
 
