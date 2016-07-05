@@ -143,15 +143,30 @@ This was painstaking (especially tracing the "bean" with [this drawing tool](..)
 but got left me with a set of 81 clean images.
 
 Then I used an ipython notebook to mutate each image.
-In succession, images were randomly rotated, white-balance adjusted, obscured..
+Images were randomly rotated, white-balance adjusted and obscured.
 This creates some pretty bizarre looking images!
-But, interestingly, they generally remain very recognizable.
+But, interestingly, you'll notice they remain recognizable to a human eye.
 And the label of each image is still known because we know the clean image from which it was generated.
 Check out the ipython notebook to see the process in more detail.
 
+So now we have our training data!
+We have a lot of obfuscated images and we know the underlying "true value" of the card (the label).
+We obscure the images so dramatically so that the network can learn to see pieces of cards --
+it also helps us account for small rotation and focus differences that may be present during gameplay.
 
 
-5. how to *see* individual cards with computer vision
+
+Step 5: how to *see* individual cards with computer vision
+
+Our neural network will be setup to recognize individual card images,
+but the camera will be taking a single picture of the entire playing field.
+We need a method to isolate individual cards from the larger image.
+
+For this we will lean heavily on some OpenCV tools.
+Open Computer Vision is a framework that provides a lot of commonly used computer vision methods.
+
+
+
 6. how to *recognize* cards with neural networks
 7. setting up and training a neural network in the cloud
 8. using the trained neural network on your computer
