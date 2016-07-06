@@ -15,13 +15,14 @@ and can brag about its skills via a text-to-speech system.
 Follow along to learn how the software works and how you can build your own!
 Here's how we'll proceed:
 
+
 1. some background on the game of set
 2. the physical setup with a webcam and adjustable stand
 3. an overall software gameplan
 4. generating training data for the neural network
-5. how to *see* individual cards with computer vision
+5. setting up and training a neural network in the cloud
 6. how to *recognize* cards with neural networks
-7. setting up and training a neural network in the cloud
+7. how to *see* individual cards with computer vision
 8. using the trained neural network on your computer
 9. ideas for improvements and where to go next!
 
@@ -151,6 +152,61 @@ Whew, so now we have our training data!
 We have a lot of obfuscated images and we know the underlying "true value" of the card (the label).
 We obscure the images so dramatically so that the network can learn to see pieces of cards --
 it also helps us account for small rotation and focus differences that may be present during gameplay.
+
+
+
+
+Step 5: setting up and training a neural network in the cloud
+
+In this step we'll create a convolutional neural network (CNN)
+using a machine learning framework called keras.
+We'll then use a service called Digital Ocean to setup a cloud server and train the network on our test data.
+
+A CNN is a multilayer network commonly used to recognize images.
+There is an input layer that will take in images of each card from the webcam.
+This is followed by several convolutional layers, in our case four of them.
+Think of each convolution layer as a small window that passes over the layer's input.
+The first convolutional layer will see the full input image,
+it will pass a small window over the pixels and convert what it sees in that window into a new image.
+That new image goes to the next layer which passes another
+In this way the image is condensed and CNNs are able to see features at different scales.
+For instance, if we were looking at a face,
+one layer of a CNN might notice the presence of eyes, a nose and a mouth.
+Another layer might see the relationship between two eyes.
+A further layer might "study" the shape of an eye.
+To read more about convolutional layers, see this post ...
+
+Interspersed between these convolutional sections are activation, pooling and dropout layers.
+Activation layers are designed to create a nonlinear response in the network.
+One common activation function is the rectified linear unit (the ReLU):
+if x > 0, y = x, otherwise y = 0.
+Pooling layers ...
+Dropout layers are an interesting new development in neural network design.
+They simply set a layer's nodes to zero during training with some probability
+in the neighborhood of 0.25 to 0.50.
+This means the network has to be more flexible during training,
+finding different pathways to get to the correct result.
+
+Each of these layers has an associated matrix of weights --
+the weight values start off as (almost) random numbers
+and the training process constantly tweaks these values
+so that the network outputs the correct label for some input training data.
+This process is called backpropagation, you can learn more about it here ...
+
+There are many awesome open source tools out there that can manage neural networks for you.
+I chose to use keras as it's an easy to understand Python interface.
+You can see the code I used to define the neural network here ...
+
+On to training!
+I "rented" a Digital Ocean server to train the keras CNN --
+this allowed me to use a more powerful computer than the one I have at home.
+Digital Ocean also has a nice snapshotting feature so you can work for a bit,
+snapshot the state of your machine and destroy the box (and stop paying for it).
+Then when you want to resume work you can restore from the snapshot and pick up exactly where you left off.
+Setup an account with this link ...
+Follow these instructions to setup an Ubuntu box ...
+And run this code to setup and train your network ...
+
 
 
 
