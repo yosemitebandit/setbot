@@ -31,6 +31,9 @@ if you'd just like to explore the code,
 it's available [here](https://github.com/yosemitebandit/setbot)!
 
 
+..more notes on how this uses python and ipython notebooks..and intros on ipython notebooks
+
+
 
 Step 1: Background on the game of set
 
@@ -206,11 +209,31 @@ Then when you want to resume work you can restore from the snapshot and pick up 
 Setup an account with this link ...
 Follow these instructions to setup an Ubuntu box ...
 And run this code to setup and train your network ...
+At the end of this process you'll have a JSON file that defines your network
+and a corresponding h5 file (a large one!) that denotes the final values of the weights.
+
+more on output and validation / test and monitoring accuracy
 
 
 
 
-Step 5: how to *see* individual cards with computer vision
+Step 6: how to *recognize* cards with neural networks
+
+With the trained neural network in hand we can now use it to evaluate cards.
+One cool thing about these systems is that they are very fast to evaluate,
+despite the slowness of the training phase.
+This will allow us to evaluate more than 16 cards in near realtime using just a run of the mill laptop.
+
+With this code (evaluator.ipynb?) we can inject a card image into the network and then evaluate its response.
+The code loads the model architecture and the weights,
+then applies the  ...
+Hopefully we have trained our network with enough generic data
+such that it can correctly identify an image it hasn't seen before.
+
+
+
+
+Step 7: how to *see* individual cards with computer vision
 
 Our neural network will be setup to recognize individual card images,
 but the camera will be taking a single picture of the entire playing field.
@@ -227,13 +250,6 @@ that can be fed into our neural network.
 
 
 
-Step 6: how to *recognize* cards with neural networks
 
-This is a bit of an aside as to how our neural network will recognize cards.
-
-
-
-
-7. setting up and training a neural network in the cloud
 8. using the trained neural network on your computer
 9. ideas for improvements and where to go next!
